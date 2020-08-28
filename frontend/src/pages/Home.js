@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import io from 'socket.io-client';
 
-import messageData from '../data2.json';
+import messageData from '../data.json';
 import UserList from '../components/UserList';
 import MessageList from '../components/MessageList';
 
@@ -13,6 +13,7 @@ const socket = io(ENDPOINT);
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
+    height: '100%'
   },
 }));
 
@@ -21,23 +22,25 @@ function Home() {
   const [messages, setMessages] = useState(messageData);
 
   const handleMessageSubmit = (event) => {
-    let data = event.target.message.value;
+    let message = event.target.message.value;
+    let data = { "username": socket.id, "message": message}
     event.target.message.value = '';
     event.preventDefault();
-    // setMessages(messages => [...messages, { "message": data }]);
-    socket.emit("message", { "id": socket.id, "message": data });
+    setMessages(messages => [...messages, data]);
+    socket.emit("message", data);
   }
 
   useEffect(() => {
     socket.on("message", data =>  {
+      console.log(data);
       setMessages(messages => [...messages, data]);
-    })
+    });
+
     return () => socket.disconnect();
   }, [])
 
   return (
     <Grid container className={classes.root} spacing={0}>
-      <Grid item xs={12}>
         <Grid container spacing={0}>
           <Grid item xs>
             <UserList />
@@ -46,7 +49,6 @@ function Home() {
             <MessageList list={messages} submit={handleMessageSubmit} />
           </Grid>
         </Grid>
-      </Grid>
     </Grid>  
   );
 }

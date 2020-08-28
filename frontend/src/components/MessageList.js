@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+
+import Box from '@material-ui/core/Box';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import InputBase from '@material-ui/core/InputBase';
@@ -16,81 +24,90 @@ import IconButton from '@material-ui/core/IconButton';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import SendRoundedIcon from '@material-ui/icons/SendRounded';
 
+
 const useStyles = makeStyles((theme) => ({
+  root: {
+    height: '100%',
+    maxHeight: '100%'
+  },
   sendBarContainer: {
-    margin: 0,
-    padding: 0,
     width: '100%',
-    position: 'relative',
-    top: 'auto',
-    bottom: 0,
+    flex: 'auto 1 auto',
   },
   sendBar: {
-    margin: theme.spacing(1),
+    margin: '1em auto',
     padding: '2px 4px',
     display: 'flex',
-    alignItems: 'center',
-    height: '100',
     width: '90%',
-    bottom: 0,
     borderRadius: '50px',
   },
   sendInput: {
     marginLeft: theme.spacing(1),
-    flex: 1
+    flexGrow: 1
   },
-  list: {
-    width: '100%',
-    position: 'relative',
-    overflow: 'auto',
-    height: '85%'
-  },
-  messagesContainer: {
+  messagesGridItem: {
     margin: 0,
     padding: 0,
     width: '100%',
-    height: '88vh',
-    border: 'solid 1px black',
-    position: 'relative'
+    height: '80vh',
+    flex: '1 1 auto'
   },
+  messagesContainer: {
+    position: 'relative',
+    height: '100%',
+    maxHeight: '100%',
+  },
+  list: {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    overflow: 'auto',
+  },
+  appBarText: {
+    flexGrow: 1,
+  },
+  messageBarContainer: {
+    flex: 'auto 1 auto',
+    padding: 0,
+  }
 }));
 
 function MessageList({ list, submit })  {
   const classes = useStyles();
 
   return(
-    <>
-      <Container className={classes.messagesContainer}>
-        <AppBar position="static">
-          <Toolbar>
-            <Typography>
-              User 1
-            </Typography>
-          </Toolbar>
-        </AppBar>
+    <Grid container direction="column" className={classes.root}>
+      <Grid item className={classes.messageBarContainer}>
+        <MessageAppBar />
+      </Grid>
       
-        <List className={classes.list}>
-          {list.map((item, index) => (
-            <React.Fragment key={index}>
-              <ListItem>
-                <ListItemAvatar>
-                  <Avatar>
-                    <AccountCircleIcon />
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText primary={item.message} />
-              </ListItem>
-              <Divider />
-            </React.Fragment>
-          ))}
-        </List>
-      </Container>
-      <Container className={classes.sendBarContainer}>
+      <Grid item className={classes.messagesGridItem}>
+        <Container maxWidth={false} disableGutters className={classes.messagesContainer}>
+          <List className={classes.list}>
+            {list.map((item, index) => (
+              <React.Fragment key={index}>
+                <ListItem>
+                  <ListItemAvatar>
+                    <Avatar>
+                      <AccountCircleIcon />
+                    </Avatar>
+                  </ListItemAvatar>
+                  <ListItemText primary={item.message} secondary={item.username} />
+                </ListItem>
+                <Divider />
+              </React.Fragment>
+            ))}
+          </List>
+        </Container>
+      </Grid>
+      
+      <Grid item className={classes.sendBarContainer}>
         <Paper 
           component="form" 
           className={classes.sendBar} 
           variant="outlined"
           onSubmit={submit}
+          autoComplete="off"
         >
           <InputBase
             id="message"
@@ -101,8 +118,48 @@ function MessageList({ list, submit })  {
             <SendRoundedIcon />
           </IconButton>
         </Paper>
-      </Container>
-    </>
+      </Grid>
+    </Grid>
+  );
+}
+
+const MessageAppBar = () => {
+  const classes = useStyles();
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  }
+
+  const handleClose = () => {
+    setOpen(false);
+  }
+
+  return (
+    <Container maxWidth={false} disableGutters={true}>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography className={classes.appBarText}>
+            User 1
+          </Typography>
+          <Button variant="outlined" color="inherit" onClick={handleClickOpen}>
+            LOGIN
+          </Button>
+        </Toolbar>
+      </AppBar>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+      >
+        <DialogTitle>Choose a username</DialogTitle>
+        <DialogContent>
+          <Box>
+            <InputBase></InputBase>
+            <Button>SET</Button>
+          </Box>
+        </DialogContent>
+      </Dialog>
+    </Container>
   );
 }
 

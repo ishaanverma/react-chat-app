@@ -1,4 +1,11 @@
-body {
+html, body {
   margin: 0;
   padding: 0;
+  height: 100%;
+}
+
+/* * { border: 1px solid red; } */
+
+#root, .App {
+  height: 100%;
 }

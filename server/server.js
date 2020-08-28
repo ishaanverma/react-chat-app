@@ -18,14 +18,47 @@ app.get('/', (req, res) =>  {
 });
 
 io.on('connection', (socket) => {
+  let addedUser = false;
   console.log('user connected');
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
 
   socket.on('message', (data) => {
     console.log(data);
-    io.emit('message', data);
+    socket.broadcast.emit('message', {
+      username: data.username,
+      message: data.message
+    });
+  });
+
+  // when client emits add user, execute this
+  // socket.on('add user', (username) => {
+  //   console.log(username);
+  //   if (addedUser) return;
+
+  //   // store username in socket session
+  //   socket.username = username.id;
+  //   addedUser = true;
+
+  //   socket.broadcast.emit('user joined', {
+  //     username: socket.username,
+  //   });
+  // });
+
+  // when client emits typing, broadcast it
+  // socket.on('typing', () => {
+  //   socket.broadcast.emit('typing', {
+  //     username: socket.username,
+  //   });
+  // });
+
+  // // when client emits stop typing, broadcast it
+  // socket.on('stop typing', () => {
+  //   socket.broadcast.emit('stop typing', {
+  //     username: socket.username,
+  //   });
+  // });
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
   });
 });
 
