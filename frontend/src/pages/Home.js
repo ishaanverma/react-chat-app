@@ -41,14 +41,14 @@ function Home() {
 
   return (
     <Grid container className={classes.root} spacing={0}>
-        <Grid container spacing={0}>
-          <Grid item xs>
-            <UserList />
-          </Grid>
-          <Grid item xs={9}>
-            <MessageList list={messages} submit={handleMessageSubmit} />
-          </Grid>
+      <Grid container spacing={0}>
+        <Grid item xs>
+          <UserList />
         </Grid>
+        <Grid item xs={9}>
+          <MessageList list={messages} submit={handleMessageSubmit} />
+        </Grid>
+      </Grid>
     </Grid>  
   );
 }
