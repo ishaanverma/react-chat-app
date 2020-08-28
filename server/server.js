@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+const sequelize = require('./models');
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -16,6 +17,19 @@ const io = require('socket.io')(http);
 app.get('/', (req, res) =>  {
   res.send('Hello World');
 });
+
+async function assertDatabaseConnection() {
+  try {
+    await sequelize.authenticate();
+    console.log('Connected to DB');
+  } catch (error) {
+    console.log('Connection to Db Failed:');
+    console.log(error.message);
+  }
+  // sequelize.sync();
+}
+
+assertDatabaseConnection();
 
 io.on('connection', (socket) => {
   let addedUser = false;
