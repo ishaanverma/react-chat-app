@@ -13,7 +13,7 @@ const socket = io(ENDPOINT);
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
-    height: '100%'
+    height: '100vh'
   },
 }));
 

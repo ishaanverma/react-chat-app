@@ -32,7 +32,9 @@ const useStyles = makeStyles((theme) => ({
   },
   sendBarContainer: {
     width: '100%',
-    flex: 'auto 1 auto',
+    flex: 'auto 0 auto',
+    marginTop: '1em',
+    borderTop: '1px solid #CCC'
   },
   sendBar: {
     margin: '1em auto',
