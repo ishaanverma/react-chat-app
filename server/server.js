@@ -1,4 +1,5 @@
 const express = require('express');
+const WebSocket = require('ws');
 const morgan = require('morgan');
 const cors = require('cors');
 const sequelize = require('./models');
@@ -12,7 +13,7 @@ app.use(express.json());
 app.use(cors())
 
 const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+const wss = new WebSocket.Server({ server: http });
 
 app.get('/', (req, res) =>  {
   res.send('Hello World');
@@ -29,52 +30,19 @@ async function assertDatabaseConnection() {
   // sequelize.sync();
 }
 
-assertDatabaseConnection();
+// assertDatabaseConnection();
 
-io.on('connection', (socket) => {
-  let addedUser = false;
+wss.on('connection', (ws, request) => {
   console.log('user connected');
 
-  socket.on('message', (data) => {
-    console.log(data);
-    socket.broadcast.emit('message', {
-      username: data.username,
-      message: data.message
-    });
-  });
-
-  // when client emits add user, execute this
-  // socket.on('add user', (username) => {
-  //   console.log(username);
-  //   if (addedUser) return;
-
-  //   // store username in socket session
-  //   socket.username = username.id;
-  //   addedUser = true;
-
-  //   socket.broadcast.emit('user joined', {
-  //     username: socket.username,
-  //   });
-  // });
-
-  // when client emits typing, broadcast it
-  // socket.on('typing', () => {
-  //   socket.broadcast.emit('typing', {
-  //     username: socket.username,
-  //   });
-  // });
-
-  // // when client emits stop typing, broadcast it
-  // socket.on('stop typing', () => {
-  //   socket.broadcast.emit('stop typing', {
-  //     username: socket.username,
-  //   });
-  // });
-
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  });
-});
+  ws.on('message', (data) => {
+    wss.clients.forEach((client) => {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(data);
+      }
+    })
+  })
+})
 
 http.listen(PORT, () =>  {
   console.log(`Listening on http://localhost:${PORT}`);
