@@ -3,12 +3,6 @@ const bcrypt = require('bcrypt');
 
 const UserDefine = (sequelize) => {
   sequelize.define('User', {
-    id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
-      type: DataTypes.INTEGER
-    },
     email: {
       allowNull: false,
       type: DataTypes.STRING,
@@ -27,14 +21,17 @@ const UserDefine = (sequelize) => {
     password: {
       allowNull: false,
       type: DataTypes.STRING,
-      validate: {
-        is: /^[0-9a-f]{64}$/i
-      }
     }
   },  {
     hooks: {
       beforeCreate: async (user, options) => {
-        const hashedPassword = await bcrypt.hash(user.password, await bcrypt.genSalt(8));
+        let hashedPassword;
+        try {
+          const salt = await bcrypt.genSalt(8);
+          hashedPassword = await bcrypt.hash(user.password, salt);
+        } catch (error) {
+          console.log(error);
+        }
         user.password = hashedPassword;
       },
     },

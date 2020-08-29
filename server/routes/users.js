@@ -1,10 +1,11 @@
 const express = require('express');
-const sequelize = require('../models');
-const { User: user } = sequelize.models;
+const { models } = require('../models');
 
-const router = express.router();
+const router = express.Router();
 
 router.get('/all', async (req, res) => {
-  const allUsers = await user.findAll();
+  const allUsers = await models.User.findAll();
   res.send(allUsers);
 });
+
+module.exports = router;

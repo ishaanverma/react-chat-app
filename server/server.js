@@ -1,8 +1,12 @@
 const express = require('express');
 const WebSocket = require('ws');
 const morgan = require('morgan');
+const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const dotenv = require('dotenv');
 const sequelize = require('./models');
+const usersPath = require('./routes/users');
+const authPath = require('./routes/auth');
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -11,9 +15,12 @@ const app = express();
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(cors())
+app.use('/users', usersPath);
+app.use('/auth', authPath);
+dotenv.config();
 
 const http = require('http').createServer(app);
-const wss = new WebSocket.Server({ server: http });
+const wss = new WebSocket.Server({ noServer: true });
 
 app.get('/', (req, res) =>  {
   res.send('Hello World');
@@ -30,7 +37,38 @@ async function assertDatabaseConnection() {
   // sequelize.sync();
 }
 
-// assertDatabaseConnection();
+assertDatabaseConnection();
+
+const authenticate = (request, callback) => {
+  const token = request.url;
+  if (!token) {
+    callback(new Error('Authorization Failed'));
+    return;
+  }
+
+  try {
+    const verified = jwt.verify(token.split("=")[1], process.env.SECRET);
+    request.userId = verified.id;
+  } catch(error)  {
+    callback(new Error(error));
+    return;
+  }
+  callback();
+}
+
+http.on('upgrade', function upgrade(request, socket, head) {
+  authenticate(request, (err) => {
+    if (err) {
+      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+      socket.destroy();
+      return;
+    }
+
+    wss.handleUpgrade(request, socket, head, function done(ws) {
+      wss.emit('connection', ws, request);
+    });
+  });
+});
 
 wss.on('connection', (ws, request) => {
   console.log('user connected');
@@ -41,6 +79,10 @@ wss.on('connection', (ws, request) => {
         client.send(data);
       }
     })
+  })
+
+  ws.on('close', () => {
+    console.log('user disconnected');
   })
 })
 
