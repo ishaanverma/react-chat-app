@@ -9,6 +9,7 @@
   "license": "MIT",
   "dependencies": {
     "bcrypt": "^5.0.0",
+    "cookie": "^0.4.1",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
@@ -18,7 +19,6 @@
     "nodemon": "^2.0.4",
     "pg": "^8.3.3",
     "sequelize": "^6.3.4",
-    "set-cookie-parser": "^2.4.6",
-    "ws": "^7.3.1"
+    "socket.io": "^2.3.0"
   }
 }

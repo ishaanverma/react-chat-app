@@ -1,10 +1,9 @@
 const express = require('express');
-const WebSocket = require('ws');
 const morgan = require('morgan');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const setCookie = require('set-cookie-parser');
+const cookie = require('cookie');
 const sequelize = require('./models');
 const usersPath = require('./routes/users');
 const authPath = require('./routes/auth');
@@ -21,7 +20,7 @@ app.use('/auth', authPath);
 dotenv.config();
 
 const http = require('http').createServer(app);
-const wss = new WebSocket.Server({ noServer: true });
+const io = require('socket.io')(http)
 
 async function assertDatabaseConnection() {
   try {
@@ -36,52 +35,36 @@ async function assertDatabaseConnection() {
 
 assertDatabaseConnection();
 
-const authenticate = (request, callback) => {
-  const cookies = setCookie(request.headers.cookie);
-  const token = cookies[0].token;
+io.use((socket, next) => {
+  let cookies = socket.request.headers.cookie;
+  cookies = cookie.parse(cookies);
+  const token = cookies.token;
   if (!token) {
-    callback(new Error('Authorization Failed'));
+    next(new Error('Authorization Failed'));
     return;
   }
 
   try {
     const verified = jwt.verify(token, process.env.SECRET);
-    request.userId = verified.id;
+    socket.userId = verified.id;
+    // console.log(verified);
   } catch(error)  {
-    callback(new Error(error));
+    next(new Error('Authorization Failed'));
     return;
   }
-  callback();
-}
-
-http.on('upgrade', function upgrade(request, socket, head) {
-  authenticate(request, (err) => {
-    if (err) {
-      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
-      socket.destroy();
-      return;
-    }
-
-    wss.handleUpgrade(request, socket, head, function done(ws) {
-      wss.emit('connection', ws, request);
-    });
-  });
+  next();
 });
 
-wss.on('connection', (ws, request) => {
+io.on('connection', socket => {
   console.log('user connected');
 
-  ws.on('message', (data) => {
-    wss.clients.forEach((client) => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(data);
-      }
-    })
-  })
-
-  ws.on('close', () => {
+  socket.on('message', data => {
+    console.log(data);
+    socket.broadcast.emit('message', data)
+  });
+  socket.on('disconnect', () => {
     console.log('user disconnected');
-  })
+  });
 })
 
 http.listen(PORT, () =>  {

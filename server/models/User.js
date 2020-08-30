@@ -15,7 +15,7 @@ const UserDefine = (sequelize) => {
       allowNull: false,
       type: DataTypes.STRING,
       validate: {
-        isAlpha: true
+        is: /^([a-z]+[\s]?[a-z]+)*$/i
       }
     },
     password: {

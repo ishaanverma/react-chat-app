@@ -3,8 +3,11 @@ const { models } = require('../models');
 
 const router = express.Router();
 
+// TODO: add authentication
 router.get('/all', async (req, res) => {
-  const allUsers = await models.User.findAll();
+  const allUsers = await models.User.findAll({
+    attributes: ['id', 'name']
+  });
   res.send(allUsers);
 });
 
