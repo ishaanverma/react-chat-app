@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-import io from 'socket.io-client';
+// import WebSocket from 'websocket';
 
 import messageData from '../data2.json';
 import UserList from '../components/UserList';
 import MessageList from '../components/MessageList';
 
-const ENDPOINT = 'http://localhost:5000';
-const socket = io(ENDPOINT);
+const ENDPOINT = process.env.WEBSOCKET_ENDPOINT || 'ws://localhost:5000';
+const socket = new WebSocket(ENDPOINT);
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,21 +22,28 @@ function Home() {
   const [messages, setMessages] = useState(messageData);
 
   const handleMessageSubmit = (event) => {
-    let message = event.target.message.value;
-    let data = { "username": socket.id, "message": message}
-    event.target.message.value = '';
     event.preventDefault();
+    const message = event.target.message.value;
+    const data = { "type": "message", "message": message}
+    event.target.message.value = '';
     setMessages(messages => [...messages, data]);
-    socket.emit("message", data);
+    socket.send(JSON.stringify(data));
   }
 
   useEffect(() => {
-    socket.on("message", data =>  {
+    socket.onmessage = (event) =>  {
+      const data = JSON.parse(event.data);
       console.log(data);
-      setMessages(messages => [...messages, data]);
-    });
+      switch(event.type) {
+        case "message":
+          setMessages(messages => [...messages, data]);
+          break;
+        default:
+          console.log("msg type not identified");
+      }
+    };
 
-    return () => socket.disconnect();
+    return () => socket.close();
   }, [])
 
   return (
