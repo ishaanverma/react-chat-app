@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function UserList() {
+function ChatList() {
   const classes = useStyles();
 
   return(
@@ -66,4 +66,4 @@ function UserList() {
   );
 }
 
-export default UserList;
+export default ChatList;
