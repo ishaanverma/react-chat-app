@@ -11,6 +11,7 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Divider from '@material-ui/core/Divider';
 import Avatar from '@material-ui/core/Avatar';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import ListDialog from './ListDialog';
 
 const useStyles = makeStyles((theme) => ({
   list: {
@@ -37,15 +38,17 @@ function UserList() {
             </Typography>
           </Toolbar>
         </AppBar>
+        <ListDialog />
       
         <List>
+          <Divider />
           <ListItem>
             <ListItemAvatar>
               <Avatar>
                 <AccountCircleIcon />
               </Avatar>
             </ListItemAvatar>
-            <ListItemText primary="User 1" />
+            <ListItemText primary="Chat Room 1" />
           </ListItem>
           <Divider />
           <ListItem>
@@ -54,7 +57,7 @@ function UserList() {
                 <AccountCircleIcon />
               </Avatar>
             </ListItemAvatar>
-            <ListItemText primary="User 2" />
+            <ListItemText primary="Chat Room 2" />
           </ListItem>
           <Divider />
         </List>
