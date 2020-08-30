@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useReducer } from 'react';
+import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
@@ -14,6 +15,8 @@ import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import CommentIcon from '@material-ui/icons/Comment';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import { apiReducer } from '../reducer/apiReducer';
 
 const useStyles = makeStyles((theme) => ({
   buttonContainer: {
@@ -29,9 +32,25 @@ const useStyles = makeStyles((theme) => ({
 const ListDialog = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
+  const [userList, dispatchUserList] = useReducer(apiReducer, {
+    data: [],
+    isLoading: false,
+    isError: false
+  });
 
-  const handleButton = () => {
+  const handleButton = async () => {
     setOpen(true);
+    dispatchUserList({ type: "API_FETCH_INIT" });
+    const result = await axios.get('/users/all');
+
+    try {
+      dispatchUserList({ 
+        type: "API_FETCH_SUCCESS",
+        payload: result.data
+      });
+    } catch(err) {
+      dispatchUserList({ type: "API_FETCH_ERROR" });
+    }
   }
 
   const handleClose = () => {
@@ -41,15 +60,13 @@ const ListDialog = () => {
   return(
     <div className={classes.buttonContainer}>
       <Button variant="outlined" onClick={handleButton}>New Chat</Button>
-      <UserDialog open={open} onClose={handleClose}/>
+      <UserDialog open={open} onClose={handleClose} userList={userList}/>
     </div>
   );
 }
 
-const UserDialog = ({ open, onClose }) => {
-  const [checked, setChecked] = React.useState([0]);
-  // const classes = useStyles();
-
+const UserDialog = ({ open, onClose, userList }) => {
+  const [checked, setChecked] = React.useState([]);
   const handleToggle = (value) => () => {
     const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
@@ -73,29 +90,31 @@ const UserDialog = ({ open, onClose }) => {
       <DialogContent dividers>
         <TextField label="Chat Name" variant="outlined" required margin="normal" fullWidth/>
         <List>
-          {[0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13].map((value) => {
-            const labelId = `checkbox-list-label-${value}`;
-
-            return (
-              <ListItem key={value} role={undefined} dense button onClick={handleToggle(value)}>
-                <ListItemIcon>
-                  <Checkbox
-                    edge="start"
-                    checked={checked.indexOf(value) !== -1}
-                    tabIndex={-1}
-                    disableRipple
-                    inputProps={{ 'aria-labelledby': labelId }}
-                  />
-                </ListItemIcon>
-                <ListItemText id={labelId} primary={`User ${value + 1}`} />
-                <ListItemSecondaryAction>
-                  <IconButton edge="end" aria-label="comments">
-                    <CommentIcon />
-                  </IconButton>
-                </ListItemSecondaryAction>
-              </ListItem>
-            );
-          })}
+          { userList.isError && <p>Error</p> }
+          {userList.isLoading ? (
+            <LinearProgress />
+          ) : (
+            userList.data.map((item, index) => {
+              return(
+                <ListItem key={index} role={undefined} dense button onClick={handleToggle(item)}>
+                  <ListItemIcon>
+                    <Checkbox
+                      edge="start"
+                      checked={checked.indexOf(item) !== -1}
+                      tabIndex={-1}
+                      disableRipple
+                    />
+                  </ListItemIcon>
+                  <ListItemText primary={item.name} />
+                  <ListItemSecondaryAction>
+                    <IconButton edge="end" aria-label="comments">
+                      <CommentIcon />
+                    </IconButton>
+                  </ListItemSecondaryAction>
+                </ListItem>
+              );
+            })
+          )}
         </List>
       </DialogContent>
       <DialogActions>

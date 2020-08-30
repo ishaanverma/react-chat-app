@@ -23,6 +23,7 @@ function Home() {
   const handleMessageSubmit = (event) => {
     event.preventDefault();
     const message = event.target.message.value;
+    if (!message) return;
     const data = { "chatId": null, "message": message }
     event.target.message.value = '';
     setMessages(messages => [...messages, data]);
@@ -39,7 +40,7 @@ function Home() {
     if (!socket) return;
 
     socket.on('message', (data) =>  {
-      data = JSON.parse(data);
+      // data = JSON.parse(data);
       console.log(data);
       setMessages(messages => [...messages, data]);
     });
