@@ -40,7 +40,6 @@ function Home() {
     if (!socket) return;
 
     socket.on('message', (data) =>  {
-      // data = JSON.parse(data);
       console.log(data);
       setMessages(messages => [...messages, data]);
     });
