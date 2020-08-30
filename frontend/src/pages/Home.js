@@ -4,7 +4,7 @@ import Grid from '@material-ui/core/Grid';
 // import WebSocket from 'websocket';
 
 import messageData from '../data2.json';
-import UserList from '../components/UserList';
+import ChatList from '../components/ChatList';
 import MessageList from '../components/MessageList';
 
 const ENDPOINT = process.env.WEBSOCKET_ENDPOINT || 'ws://localhost:5000';
@@ -50,7 +50,7 @@ function Home() {
     <Grid container className={classes.root} spacing={0}>
       <Grid container spacing={0}>
         <Grid item xs>
-          <UserList />
+          <ChatList />
         </Grid>
         <Grid item xs={9}>
           <MessageList list={messages} submit={handleMessageSubmit} />
