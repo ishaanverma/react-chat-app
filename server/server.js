@@ -21,6 +21,7 @@ dotenv.config();
 
 const http = require('http').createServer(app);
 const io = require('socket.io')(http)
+const id_to_socket = new Map();
 
 async function assertDatabaseConnection() {
   try {
@@ -46,7 +47,7 @@ io.use((socket, next) => {
 
   try {
     const verified = jwt.verify(token, process.env.SECRET);
-    socket.userId = verified.id;
+    socket.userId = verified.user_id;
     // console.log(verified);
   } catch(error)  {
     next(new Error('Authorization Failed'));
@@ -57,10 +58,12 @@ io.use((socket, next) => {
 
 io.on('connection', socket => {
   console.log('user connected');
+  id_to_socket[socket.userId] = socket.id;
 
   socket.on('message', data => {
-    console.log(data);
-    socket.broadcast.emit('message', data)
+    data = JSON.parse(data);
+    console.log(data.message);
+    socket.broadcast.emit('message', data);
   });
   socket.on('disconnect', () => {
     console.log('user disconnected');

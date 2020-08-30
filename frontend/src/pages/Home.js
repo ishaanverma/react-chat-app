@@ -7,7 +7,6 @@ import ChatList from '../components/ChatList';
 import MessageList from '../components/MessageList';
 
 const ENDPOINT = process.env.WEBSOCKET_ENDPOINT || 'http://localhost:5000';
-const socket = io(ENDPOINT);
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -18,26 +17,34 @@ const useStyles = makeStyles((theme) => ({
 
 function Home() {
   const classes = useStyles();
+  const [socket, setSocket] = useState();
   const [messages, setMessages] = useState(messageData);
 
   const handleMessageSubmit = (event) => {
     event.preventDefault();
     const message = event.target.message.value;
-    const data = { "type": "message", "message": message}
+    const data = { "chatId": null, "message": message }
     event.target.message.value = '';
     setMessages(messages => [...messages, data]);
     socket.emit('message', JSON.stringify(data));
   }
 
+  // TODO: find better way to intialize socket
   useEffect(() => {
+    const currentSocket = io(ENDPOINT);
+    setSocket(currentSocket);
+  }, [])
+
+  useEffect(() => {
+    if (!socket) return;
+
     socket.on('message', (data) =>  {
       data = JSON.parse(data);
       console.log(data);
       setMessages(messages => [...messages, data]);
     });
 
-    return () => socket.close();
-  }, [])
+  }, [socket])
 
   return (
     <Grid container className={classes.root} spacing={0}>
