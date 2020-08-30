@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const setCookie = require('set-cookie-parser');
 const sequelize = require('./models');
 const usersPath = require('./routes/users');
 const authPath = require('./routes/auth');
@@ -22,10 +23,6 @@ dotenv.config();
 const http = require('http').createServer(app);
 const wss = new WebSocket.Server({ noServer: true });
 
-app.get('/', (req, res) =>  {
-  res.send('Hello World');
-});
-
 async function assertDatabaseConnection() {
   try {
     await sequelize.authenticate();
@@ -40,14 +37,15 @@ async function assertDatabaseConnection() {
 assertDatabaseConnection();
 
 const authenticate = (request, callback) => {
-  const token = request.url;
+  const cookies = setCookie(request.headers.cookie);
+  const token = cookies[0].token;
   if (!token) {
     callback(new Error('Authorization Failed'));
     return;
   }
 
   try {
-    const verified = jwt.verify(token.split("=")[1], process.env.SECRET);
+    const verified = jwt.verify(token, process.env.SECRET);
     request.userId = verified.id;
   } catch(error)  {
     callback(new Error(error));

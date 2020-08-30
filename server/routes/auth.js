@@ -12,11 +12,10 @@ router.post('/register', async (req, res) => {
     name: name,
     password: password
   });
-  console.log(user.toJSON());
+  // console.log(user.toJSON());
   try {
     await user.save();
   } catch(error)  {
-    console.log
     return res.status(400).send(error.errors[0].message);
   }
   return res.send({ "user": user.id });
@@ -31,9 +30,8 @@ router.post('/login', async (req, res) => {
   if (!validPass) return res.status(400).send('Wrong password');
 
   const token = jwt.sign({ user_id: user.id }, process.env.SECRET);
-  res.header('auth-token', token).send(token);
-
-  // return res.send('Logged in');
+  res.cookie('token', token, { httpOnly: true, secure: false });
+  res.send("Success");
 });
 
 module.exports = router;
