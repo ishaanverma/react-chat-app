@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
-// import WebSocket from 'websocket';
-
+import io from 'socket.io-client';
 import messageData from '../data2.json';
 import ChatList from '../components/ChatList';
 import MessageList from '../components/MessageList';
 
-const ENDPOINT = process.env.WEBSOCKET_ENDPOINT || 'ws://localhost:5000';
-const socket = new WebSocket(ENDPOINT);
+const ENDPOINT = process.env.WEBSOCKET_ENDPOINT || 'http://localhost:5000';
+const socket = io(ENDPOINT);
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -27,21 +26,15 @@ function Home() {
     const data = { "type": "message", "message": message}
     event.target.message.value = '';
     setMessages(messages => [...messages, data]);
-    socket.send(JSON.stringify(data));
+    socket.emit('message', JSON.stringify(data));
   }
 
   useEffect(() => {
-    socket.onmessage = (event) =>  {
-      const data = JSON.parse(event.data);
+    socket.on('message', (data) =>  {
+      data = JSON.parse(data);
       console.log(data);
-      switch(event.type) {
-        case "message":
-          setMessages(messages => [...messages, data]);
-          break;
-        default:
-          console.log("msg type not identified");
-      }
-    };
+      setMessages(messages => [...messages, data]);
+    });
 
     return () => socket.close();
   }, [])

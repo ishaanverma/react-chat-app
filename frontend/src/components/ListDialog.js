@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -19,6 +20,9 @@ const useStyles = makeStyles((theme) => ({
     padding: '0.5em 1em',
     marginLeft: 'auto',
     marginRight: 'auto'
+  },
+  dialogContainer: {
+    padding: '1em'
   }
 }));
 
@@ -44,6 +48,7 @@ const ListDialog = () => {
 
 const UserDialog = ({ open, onClose }) => {
   const [checked, setChecked] = React.useState([0]);
+  // const classes = useStyles();
 
   const handleToggle = (value) => () => {
     const currentIndex = checked.indexOf(value);
@@ -60,13 +65,15 @@ const UserDialog = ({ open, onClose }) => {
 
   return (
     <Dialog
-      maxWidth="xs"
+      fullWidth={true}
+      maxWidth="sm"
       open={open}
     >
-      <DialogTitle>Select Users</DialogTitle>
+      <DialogTitle>Create New Chat</DialogTitle>
       <DialogContent dividers>
+        <TextField label="Chat Name" variant="outlined" required margin="normal" fullWidth/>
         <List>
-          {[0, 1, 2, 3].map((value) => {
+          {[0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13].map((value) => {
             const labelId = `checkbox-list-label-${value}`;
 
             return (
