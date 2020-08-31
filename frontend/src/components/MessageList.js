@@ -1,12 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-
-import Box from '@material-ui/core/Box';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -135,7 +130,7 @@ const MessageAppBar = () => {
           <Typography className={classes.appBarText}>
             User 1
           </Typography>
-          <Button variant="outlined" color="inherit" onClick={handleClickOpen}>
+          <Button variant="outlined" color="inherit">
             Logout
           </Button>
         </Toolbar>
