@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useReducer } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import axios from 'axios';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -10,8 +11,10 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Divider from '@material-ui/core/Divider';
 import Avatar from '@material-ui/core/Avatar';
-import AccountCircleIcon from '@material-ui/icons/AccountCircle';
+import ChatIcon from '@material-ui/icons/Chat';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import ListDialog from './ListDialog';
+import { apiReducer } from '../reducer/apiReducer';
 
 const useStyles = makeStyles((theme) => ({
   list: {
@@ -27,6 +30,30 @@ const useStyles = makeStyles((theme) => ({
 
 function ChatList() {
   const classes = useStyles();
+  const [chatList, dispatchChatList] = useReducer(apiReducer, {
+    data: [],
+    isLoading: false,
+    isError: false
+  });
+  
+  const handleUserList = async () => {
+    dispatchChatList({ type: "API_FETCH_INIT" });
+    const result = await axios.get('/chats/all');
+
+    try {
+      dispatchChatList({
+        type: "API_FETCH_SUCCESS",
+        payload: result.data
+      });
+    } catch {
+      dispatchChatList({ type: "API_FETCH_ERROR"});
+    }
+    console.log(result);
+  }
+
+  useEffect(() => {
+    handleUserList();
+  }, []);
 
   return(
     <>
@@ -34,7 +61,7 @@ function ChatList() {
         <AppBar position="static">
           <Toolbar>
             <Typography>
-              User List
+              Chats
             </Typography>
           </Toolbar>
         </AppBar>
@@ -42,24 +69,25 @@ function ChatList() {
       
         <List>
           <Divider />
-          <ListItem>
-            <ListItemAvatar>
-              <Avatar>
-                <AccountCircleIcon />
-              </Avatar>
-            </ListItemAvatar>
-            <ListItemText primary="Chat Room 1" />
-          </ListItem>
-          <Divider />
-          <ListItem>
-            <ListItemAvatar>
-              <Avatar>
-                <AccountCircleIcon />
-              </Avatar>
-            </ListItemAvatar>
-            <ListItemText primary="Chat Room 2" />
-          </ListItem>
-          <Divider />
+          {chatList.isError && <p>Error</p>}
+          {chatList.isLoading ? (
+            <LinearProgress />
+          ) : (
+            chatList.data.map((item, index) => {
+              return(
+                <React.Fragment key={index}>
+                  <ListItem button>
+                    <ListItemAvatar>
+                      <Avatar>
+                        <ChatIcon />
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText primary={item.name} />
+                  </ListItem>
+                  <Divider />
+                </React.Fragment>
+              );})
+          )}
         </List>
       </Container>
     </>

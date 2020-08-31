@@ -10,10 +10,10 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Checkbox from '@material-ui/core/Checkbox';
-import IconButton from '@material-ui/core/IconButton';
-import CommentIcon from '@material-ui/icons/Comment';
+import Avatar from '@material-ui/core/Avatar';
+import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { apiReducer } from '../reducer/apiReducer';
@@ -66,7 +66,11 @@ const ListDialog = () => {
 }
 
 const UserDialog = ({ open, onClose, userList }) => {
+  const [error, setError] = React.useState(false);
+  const [name, setName] = React.useState("");
   const [checked, setChecked] = React.useState([]);
+
+  // keep track of selected items in Dialog
   const handleToggle = (value) => () => {
     const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
@@ -78,8 +82,32 @@ const UserDialog = ({ open, onClose, userList }) => {
     }
 
     setChecked(newChecked);
+    console.log(newChecked);
   };
 
+  // keep track of chat name
+  const handleTextChange = (event) => {
+    setName(event.target.value);
+  };
+
+  // send name and checked when clicked
+  const handleOk = async () => {
+    if (!name) {
+      setError(true);
+      return;
+    }
+    console.log(name);
+    console.log(checked);
+    const result = await axios.post('/chats/create', {
+      "name": name,
+      "members": checked
+    });
+    console.log(result);
+    setChecked([]);
+    setName('');
+    onClose();
+  };
+  // TODO: make a form with validation
   return (
     <Dialog
       fullWidth={true}
@@ -88,7 +116,15 @@ const UserDialog = ({ open, onClose, userList }) => {
     >
       <DialogTitle>Create New Chat</DialogTitle>
       <DialogContent dividers>
-        <TextField label="Chat Name" variant="outlined" required margin="normal" fullWidth/>
+        <TextField 
+          label="Chat Name"
+          variant="outlined"
+          margin="normal"
+          onChange={handleTextChange}
+          error={error}
+          required
+          fullWidth
+        />
         <List>
           { userList.isError && <p>Error</p> }
           {userList.isLoading ? (
@@ -96,20 +132,20 @@ const UserDialog = ({ open, onClose, userList }) => {
           ) : (
             userList.data.map((item, index) => {
               return(
-                <ListItem key={index} role={undefined} dense button onClick={handleToggle(item)}>
-                  <ListItemIcon>
-                    <Checkbox
-                      edge="start"
-                      checked={checked.indexOf(item) !== -1}
-                      tabIndex={-1}
-                      disableRipple
-                    />
-                  </ListItemIcon>
+                <ListItem key={index} role={undefined} onClick={handleToggle(item)} dense button disableRipple>
+                  <ListItemAvatar>
+                    <Avatar>
+                      <AccountCircleIcon />
+                    </Avatar>
+                  </ListItemAvatar>
                   <ListItemText primary={item.name} />
                   <ListItemSecondaryAction>
-                    <IconButton edge="end" aria-label="comments">
-                      <CommentIcon />
-                    </IconButton>
+                    <Checkbox
+                      edge="end"
+                      onChange={handleToggle(item)}
+                      checked={checked.indexOf(item) !== -1}
+                      tabIndex={-1}
+                    />
                   </ListItemSecondaryAction>
                 </ListItem>
               );
@@ -121,7 +157,7 @@ const UserDialog = ({ open, onClose, userList }) => {
         <Button onClick={onClose} color="primary">
           Cancel
         </Button>
-        <Button color="primary">
+        <Button color="primary" onClick={handleOk}>
           Ok
         </Button>
       </DialogActions>
