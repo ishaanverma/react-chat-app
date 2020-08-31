@@ -1,11 +1,17 @@
 const express = require('express');
+const { Op } = require('sequelize');
+const { isAuthenticated } = require('./isAuth');
 const { models } = require('../models');
 
 const router = express.Router();
 
-// TODO: add authentication
-router.get('/all', async (req, res) => {
+router.get('/all', isAuthenticated, async (req, res) => {
   const allUsers = await models.User.findAll({
+    where: {
+      id: {
+        [Op.ne]: req.userId,
+      },
+    },
     attributes: ['id', 'name']
   });
   res.send(allUsers);

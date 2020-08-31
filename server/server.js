@@ -4,9 +4,11 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const cookie = require('cookie');
+const cookieParser = require('cookie-parser');
 const sequelize = require('./models');
 const usersPath = require('./routes/users');
 const authPath = require('./routes/auth');
+const chatPath = require('./routes/chats');
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -14,9 +16,11 @@ const app = express();
 // setup middlewares
 app.use(morgan('dev'));
 app.use(express.json());
-app.use(cors())
+app.use(cors());
+app.use(cookieParser());
 app.use('/users', usersPath);
 app.use('/auth', authPath);
+app.use('/chats', chatPath);
 dotenv.config();
 
 const http = require('http').createServer(app);
