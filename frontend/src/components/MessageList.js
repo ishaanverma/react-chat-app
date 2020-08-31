@@ -127,15 +127,6 @@ function MessageList({ list, submit })  {
 
 const MessageAppBar = () => {
   const classes = useStyles();
-  const [open, setOpen] = useState(false);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  }
-
-  const handleClose = () => {
-    setOpen(false);
-  }
 
   return (
     <Container maxWidth={false} disableGutters={true}>
@@ -145,22 +136,10 @@ const MessageAppBar = () => {
             User 1
           </Typography>
           <Button variant="outlined" color="inherit" onClick={handleClickOpen}>
-            LOGIN
+            Logout
           </Button>
         </Toolbar>
       </AppBar>
-      <Dialog
-        open={open}
-        onClose={handleClose}
-      >
-        <DialogTitle>Choose a username</DialogTitle>
-        <DialogContent>
-          <Box>
-            <InputBase></InputBase>
-            <Button>SET</Button>
-          </Box>
-        </DialogContent>
-      </Dialog>
     </Container>
   );
 }
