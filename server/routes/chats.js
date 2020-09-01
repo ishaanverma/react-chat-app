@@ -22,7 +22,7 @@ router.post('/create', isAuthenticated, async (req, res) => {
   return res.send({ "chat": chat.id });
 });
 
-router.get('/all', isAuthenticated, async(req, res) => {
+router.get('/all', isAuthenticated, async (req, res) => {
   const user = await models.User.findOne({
     where: {
       id: req.userId

@@ -9,6 +9,7 @@ const sequelize = require('./models');
 const usersPath = require('./routes/users');
 const authPath = require('./routes/auth');
 const chatPath = require('./routes/chats');
+const messagePath = require('./routes/messages');
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -21,6 +22,7 @@ app.use(cookieParser());
 app.use('/users', usersPath);
 app.use('/auth', authPath);
 app.use('/chats', chatPath);
+app.use('/messages', messagePath);
 dotenv.config();
 
 const http = require('http').createServer(app);
@@ -40,34 +42,55 @@ async function assertDatabaseConnection() {
 
 assertDatabaseConnection();
 
+// authenticate user when establishing web socket
 io.use((socket, next) => {
   let cookies = socket.request.headers.cookie;
   cookies = cookie.parse(cookies);
   const token = cookies.token;
   if (!token) {
-    next(new Error('Authorization Failed'));
-    return;
+    return next(new Error('Authorization Failed'));
   }
 
   try {
     const verified = jwt.verify(token, process.env.SECRET);
     socket.userId = verified.user_id;
   } catch(error)  {
-    next(new Error('Authorization Failed'));
-    return;
+    return next(new Error('Authorization Failed'));
   }
   next();
 });
 
-io.on('connection', socket => {
+io.on('connection', async (socket) => {
   console.log('user connected');
   id_to_socket[socket.userId] = socket.id;
 
-  socket.on('message', data => {
-    data = JSON.parse(data);
-    console.log(data.message);
-    socket.broadcast.emit('message', data);
+  // get chats belonging to a user
+  const user = await sequelize.models.User.findOne({
+    where: {
+      id: socket.userId
+    }
   });
+  const chats = await user.getChats({
+    attributes: [["id", "chatId"], "name"],
+    joinTableAttributes: []
+  });
+  // when user comes online, join the chat
+  chats.forEach(element => {
+    socket.join(element.dataValues.chatId.toString());
+  });
+
+  socket.on('message', async (data) => {
+    data = JSON.parse(data);
+    console.log(data);
+    await sequelize.models.Message.create({
+      type: 'text',
+      content: data.message,
+      UserId: socket.userId,
+      ChatId: data.chatId
+    });
+    socket.to(data.chatId).emit('message', data);
+  });
+
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
