@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-
 import Button from '@material-ui/core/Button';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -18,6 +17,7 @@ import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import SendRoundedIcon from '@material-ui/icons/SendRounded';
+import { ChatInfoContext } from '../context/chatInfo';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -71,11 +71,12 @@ const useStyles = makeStyles((theme) => ({
 
 function MessageList({ list, submit })  {
   const classes = useStyles();
+  const { chatInfo } = useContext(ChatInfoContext);
 
   return(
     <Grid container direction="column" className={classes.root}>
       <Grid item className={classes.messageBarContainer}>
-        <MessageAppBar />
+        <MessageAppBar chatName={chatInfo.chatName} />
       </Grid>
       
       <Grid item className={classes.messagesGridItem}>
@@ -89,7 +90,7 @@ function MessageList({ list, submit })  {
                       <AccountCircleIcon />
                     </Avatar>
                   </ListItemAvatar>
-                  <ListItemText primary={item.message} secondary={item.username} />
+                  <ListItemText primary={item.content} secondary={item.username} />
                 </ListItem>
                 <Divider />
               </React.Fragment>
@@ -110,8 +111,12 @@ function MessageList({ list, submit })  {
             id="message"
             className={classes.sendInput}
             placeholder="Send a message"
+            disabled={chatInfo.chatId ? false : true}
           />
-          <IconButton type="submit">
+          <IconButton 
+            type="submit"
+            disabled={chatInfo.chatId ? false : true}
+          >
             <SendRoundedIcon />
           </IconButton>
         </Paper>
@@ -120,7 +125,7 @@ function MessageList({ list, submit })  {
   );
 }
 
-const MessageAppBar = () => {
+const MessageAppBar = ({ chatName='' }) => {
   const classes = useStyles();
 
   return (
@@ -128,7 +133,7 @@ const MessageAppBar = () => {
       <AppBar position="static">
         <Toolbar>
           <Typography className={classes.appBarText}>
-            User 1
+            {chatName}
           </Typography>
           <Button variant="outlined" color="inherit">
             Logout

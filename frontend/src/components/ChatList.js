@@ -1,6 +1,5 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import axios from 'axios';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
@@ -14,7 +13,7 @@ import Avatar from '@material-ui/core/Avatar';
 import ChatIcon from '@material-ui/icons/Chat';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import ListDialog from './ListDialog';
-import { apiReducer } from '../reducer/apiReducer';
+import { ChatInfoContext } from '../context/chatInfo';
 
 const useStyles = makeStyles((theme) => ({
   list: {
@@ -28,32 +27,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ChatList() {
+function ChatList({ list }) {
   const classes = useStyles();
-  const [chatList, dispatchChatList] = useReducer(apiReducer, {
-    data: [],
-    isLoading: false,
-    isError: false
-  });
+  const { chatInfo, setChatInfo } = useContext(ChatInfoContext);
   
-  const handleUserList = async () => {
-    dispatchChatList({ type: "API_FETCH_INIT" });
-    const result = await axios.get('/chats/all');
-
-    try {
-      dispatchChatList({
-        type: "API_FETCH_SUCCESS",
-        payload: result.data
-      });
-    } catch {
-      dispatchChatList({ type: "API_FETCH_ERROR"});
-    }
-    console.log(result);
+  const handleListClick = (item) => () => {
+    setChatInfo({ 
+      ...chatInfo, 
+      chatId: item.chatId,
+      chatName: item.name
+    });
   }
-
-  useEffect(() => {
-    handleUserList();
-  }, []);
 
   return(
     <>
@@ -69,14 +53,14 @@ function ChatList() {
       
         <List>
           <Divider />
-          {chatList.isError && <p>Error</p>}
-          {chatList.isLoading ? (
+          {list.isError && <p>Error</p>}
+          {list.isLoading ? (
             <LinearProgress />
           ) : (
-            chatList.data.map((item, index) => {
+            list.data.map((item, index) => {
               return(
                 <React.Fragment key={index}>
-                  <ListItem button>
+                  <ListItem button onClick={handleListClick(item)}>
                     <ListItemAvatar>
                       <Avatar>
                         <ChatIcon />
