@@ -39,7 +39,7 @@ async function assertDatabaseConnection() {
   }
   // sequelize.sync();
 }
-
+// establish connection to database
 assertDatabaseConnection();
 
 // authenticate user when establishing web socket
@@ -65,23 +65,20 @@ io.on('connection', async (socket) => {
   id_to_socket[socket.userId] = socket.id;
 
   // get chats belonging to a user
-  const user = await sequelize.models.User.findOne({
+  const chats = await sequelize.models.UserChats.findAll({
     where: {
-      id: socket.userId
-    }
-  });
-  const chats = await user.getChats({
-    attributes: [["id", "chatId"], "name"],
-    joinTableAttributes: []
+      UserId: socket.userId
+    },
+    attributes: ['ChatId']
   });
   // when user comes online, join the chat
-  chats.forEach(element => {
-    socket.join(element.dataValues.chatId.toString());
-  });
+  const chatIds = chats.map((item) => item.dataValues.ChatId.toString());
+  socket.join(chatIds);
 
   socket.on('message', async (data) => {
     data = JSON.parse(data);
     // console.log(data);
+    // TODO: validate message
     await sequelize.models.Message.create({
       type: 'text',
       content: data.content,
