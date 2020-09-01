@@ -3,7 +3,6 @@ const morgan = require('morgan');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const cookie = require('cookie');
 const cookieParser = require('cookie-parser');
 const sequelize = require('./models');
 const usersPath = require('./routes/users');
@@ -26,7 +25,7 @@ app.use('/messages', messagePath);
 dotenv.config();
 
 const http = require('http').createServer(app);
-const io = require('socket.io')(http)
+const io = require('socket.io')(http);
 const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
 const id_to_socket = new Map();
 
@@ -79,6 +78,7 @@ io.on('connection', async (socket) => {
     data = JSON.parse(data);
     // console.log(data);
     // TODO: validate message
+    // TODO: get createdAT from client?
     await sequelize.models.Message.create({
       type: 'text',
       content: data.content,

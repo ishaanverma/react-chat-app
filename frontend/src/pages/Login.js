@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 import axios from 'axios';
@@ -9,6 +9,7 @@ import Button from '@material-ui/core/Button';
 
 import { useAuth } from '../context/auth';
 import { Redirect } from 'react-router-dom';
+import { ChatInfoContext } from '../context/chatInfo';
 
 const ENDPOINT = '/auth/login';
 
@@ -37,7 +38,9 @@ const useStyles = makeStyles((theme) => ({
 function Login() {
   const classes = useStyles();
   const [isLoggedIn, setLoggedIn] = useState(false);
+  const [helperText, setHelperText] = useState('');
   const { setAuthenticated } = useAuth();
+  const { chatInfo, setChatInfo } = useContext(ChatInfoContext);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -51,12 +54,19 @@ function Login() {
     } catch(err)  {
       console.log(err);
     }
-
-    if (result.status === 200)  {
+    console.log(result.data.name);
+    setTimeout(() => {}, 5000);
+    if (result && result.status === 200)  {
       setAuthenticated(true);
       setLoggedIn(true);
+      setChatInfo({
+        ...chatInfo,
+        username: result.data.name
+      })
+      localStorage.setItem('username', result.data.name);
     } else {
-      console.log(result.status);
+      setHelperText('An Error Occurred');
+      console.log(result);
     }
   }
 
@@ -69,8 +79,20 @@ function Login() {
       <Paper variant="outlined" className={classes.container}>
         <Typography variant="h3">Login</Typography>
         <form onSubmit={handleSubmit}>
-          <TextField name="email" label="Email" variant="outlined" />
-          <TextField name="password" label="Password" variant="outlined" type="password"/>
+          <TextField
+            name="email"
+            label="Email"
+            variant="outlined"
+            error={helperText ? true : false}
+          />
+          <TextField
+            name="password"
+            label="Password"
+            variant="outlined"
+            type="password"
+            error={helperText ? true : false}
+            helperText={helperText}
+          />
           <div style={{ width: '100%' }}>
             <Button 
               variant="contained" 

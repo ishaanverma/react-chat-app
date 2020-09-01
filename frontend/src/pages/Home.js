@@ -36,9 +36,16 @@ function Home() {
     event.preventDefault();
     const message = event.target.message.value;
     if (!message) return;
-    const data = { "chatId": chatInfo.chatId, "content": message }
+    const data = { 
+      "type": "text",
+      "content": message,
+      "createdAt": "null",
+      "chatId": chatInfo.chatId,
+      "User": {
+        "name": chatInfo.username
+      }
+    }
     event.target.message.value = '';
-    // setMessages(messages => [...messages, data]);
     dispatchMessageList({
       type: "APPEND_TO_STATE",
       payload: data
@@ -88,14 +95,23 @@ function Home() {
   useEffect(() => {
     if (!socket) return;
 
+    // message event
     socket.on('message', (data) =>  {
       console.log(data);
       dispatchMessageList({
-        type: "APPEND_TO_STATE",
+        type: 'APPEND_TO_STATE',
         payload: data
       });
-      // setMessages(messages => [...messages, data]);
     });
+
+    // chat joined event
+    socket.on('chat joined', (data) => {
+      dispatchChatList({
+        type: 'APPEND_TO_STATE',
+        payload: data
+      });
+    });
+
 
   }, [socket])
 

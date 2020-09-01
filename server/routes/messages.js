@@ -25,7 +25,11 @@ router.post('/all', isAuthenticated, async(req, res) => {
     where: {
       ChatId: chat[0].dataValues.id
     },
-    attributes: ['type', 'content', 'createdAt', 'UserId', 'ChatId']
+    include: [{ 
+      model: models.User,
+      attributes: ['name'],
+    }],
+    attributes: ['type', 'content', 'createdAt', 'ChatId'],
   })
   res.status(200).send(messages);
 });

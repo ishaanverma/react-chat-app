@@ -90,7 +90,7 @@ function MessageList({ list, submit })  {
                       <AccountCircleIcon />
                     </Avatar>
                   </ListItemAvatar>
-                  <ListItemText primary={item.content} secondary={item.username} />
+                  <ListItemText primary={item.content} secondary={item.User.name} />
                 </ListItem>
                 <Divider />
               </React.Fragment>
