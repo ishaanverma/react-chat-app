@@ -81,10 +81,10 @@ io.on('connection', async (socket) => {
 
   socket.on('message', async (data) => {
     data = JSON.parse(data);
-    console.log(data);
+    // console.log(data);
     await sequelize.models.Message.create({
       type: 'text',
-      content: data.message,
+      content: data.content,
       UserId: socket.userId,
       ChatId: data.chatId
     });
