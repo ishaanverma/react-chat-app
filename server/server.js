@@ -27,6 +27,7 @@ dotenv.config();
 
 const http = require('http').createServer(app);
 const io = require('socket.io')(http)
+const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
 const id_to_socket = new Map();
 
 async function assertDatabaseConnection() {
@@ -43,10 +44,9 @@ async function assertDatabaseConnection() {
 assertDatabaseConnection();
 
 // authenticate user when establishing web socket
+io.use(wrap(cookieParser()));
 io.use((socket, next) => {
-  let cookies = socket.request.headers.cookie;
-  cookies = cookie.parse(cookies);
-  const token = cookies.token;
+  const token = socket.request.cookies.token;
   if (!token) {
     return next(new Error('Authorization Failed'));
   }
