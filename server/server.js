@@ -47,14 +47,14 @@ io.use(wrap(cookieParser()));
 io.use((socket, next) => {
   const token = socket.request.cookies.token;
   if (!token) {
-    return next(new Error('Authorization Failed'));
+    return next(new Error('Authentication Failed'));
   }
 
   try {
     const verified = jwt.verify(token, process.env.SECRET);
     socket.userId = verified.user_id;
   } catch(error)  {
-    return next(new Error('Authorization Failed'));
+    return next(new Error('Authentication Failed'));
   }
   next();
 });
@@ -78,7 +78,7 @@ io.on('connection', async (socket) => {
     data = JSON.parse(data);
     // console.log(data);
     // TODO: validate message
-    // TODO: get createdAT from client?
+    // TODO: get createdAt from client?
     await sequelize.models.Message.create({
       type: 'text',
       content: data.content,
