@@ -8,7 +8,7 @@ exports.isAuthenticated = (req, res, next) => {
   }
 
   try {
-    const verified = jwt.verify(token, process.env.SECRET);
+    const verified = jwt.verify(token, process.env.SECRET || 'secret');
     req.userId = verified.user_id;
   } catch {
     next(new Error('Authentication Failed'));

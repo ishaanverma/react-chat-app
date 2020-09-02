@@ -51,7 +51,7 @@ io.use((socket, next) => {
   }
 
   try {
-    const verified = jwt.verify(token, process.env.SECRET);
+    const verified = jwt.verify(token, process.env.SECRET || 'secret');
     socket.userId = verified.user_id;
   } catch(error)  {
     return next(new Error('Authentication Failed'));
