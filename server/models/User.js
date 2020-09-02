@@ -3,6 +3,12 @@ const bcrypt = require('bcrypt');
 
 const UserDefine = (sequelize) => {
   sequelize.define('User', {
+    id: {
+      allowNull: false,
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4
+    },
     email: {
       allowNull: false,
       type: DataTypes.STRING,

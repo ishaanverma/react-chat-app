@@ -7,6 +7,7 @@ const sequelize = new Sequelize({
   username: process.env.POSTGRES_USER || 'postgres',
   password: process.env.POSTGRES_PASSWORD || 'postgres',
   port: process.env.POSTGRES_PORT || 5432,
+  logging: false
 });
 
 const modelDefiners = [

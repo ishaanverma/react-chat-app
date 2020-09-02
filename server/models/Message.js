@@ -4,9 +4,9 @@ const MessageDefine = (sequelize) => {
   sequelize.define('Message', {
     id: {
       allowNull: false,
-      autoIncrement: true,
       primaryKey: true,
-      type: DataTypes.INTEGER
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4
     },
     type: {
       type: DataTypes.STRING,
