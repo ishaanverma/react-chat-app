@@ -12,7 +12,7 @@ import Divider from '@material-ui/core/Divider';
 import Avatar from '@material-ui/core/Avatar';
 import ChatIcon from '@material-ui/icons/Chat';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import ListDialog from './ListDialog';
+import ButtonDialog from './ButtonDialog';
 import { ChatInfoContext } from '../context/chatInfo';
 
 const useStyles = makeStyles((theme) => ({
@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ChatList({ list }) {
+function ChatUserList({ list }) {
   const classes = useStyles();
   const { chatInfo, setChatInfo } = useContext(ChatInfoContext);
   
@@ -49,7 +49,7 @@ function ChatList({ list }) {
             </Typography>
           </Toolbar>
         </AppBar>
-        <ListDialog />
+        <ButtonDialog />
       
         <List>
           <Divider />
@@ -70,7 +70,8 @@ function ChatList({ list }) {
                   </ListItem>
                   <Divider />
                 </React.Fragment>
-              );})
+              );
+            })
           )}
         </List>
       </Container>
@@ -78,4 +79,4 @@ function ChatList({ list }) {
   );
 }
 
-export default ChatList;
+export default ChatUserList;

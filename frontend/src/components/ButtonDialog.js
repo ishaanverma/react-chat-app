@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const ListDialog = () => {
+const ButtonDialog = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [userList, dispatchUserList] = useReducer(apiReducer, {
@@ -165,4 +165,4 @@ const UserDialog = ({ open, onClose, userList }) => {
   );
 }
 
-export default ListDialog;
+export default ButtonDialog;

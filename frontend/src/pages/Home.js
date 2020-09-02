@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import axios from 'axios';
 import Grid from '@material-ui/core/Grid';
 import io from 'socket.io-client';
-import ChatList from '../components/ChatList';
+import ChatUserList from '../components/ChatUserList';
 import MessageList from '../components/MessageList';
 import { apiReducerWithState } from '../reducer/apiReducerWithState';
 import { ChatInfoContext } from '../context/chatInfo';
@@ -67,12 +67,12 @@ function Home() {
     }
   }
 
-  const handleMessageList = async () => {
-    if (!chatInfo.chatId) return;
+  const handleMessageList = async (chatId) => {
+    if (!chatId) return;
 
     dispatchMessageList({ type: "API_FETCH_INIT" });
     const messageResult = await axios.post('/messages/all', {
-      "chatId": chatInfo.chatId.toString()
+      "chatId": chatId.toString()
     });
 
     try {
@@ -112,18 +112,17 @@ function Home() {
       });
     });
 
-
   }, [socket])
 
   useEffect(() => {
-    handleMessageList();
+    handleMessageList(chatInfo.chatId);
   }, [chatInfo.chatId]);
 
   return (
     <Grid container className={classes.root} spacing={0}>
       <Grid container spacing={0}>
         <Grid item xs>
-          <ChatList list={chatList} />
+          <ChatUserList list={chatList} />
         </Grid>
         <Grid item xs={9}>
           <MessageList list={messages.data} submit={handleMessageSubmit} />
