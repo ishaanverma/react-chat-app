@@ -12,13 +12,29 @@ router.post('/create', isAuthenticated, async (req, res) => {
   });
   const userIds = members.map((item) => item.id);
   userIds.push(req.userId);
-  // console.log(chat.toJSON());
+
+  // save chat and chat members to database
   try {
     await chat.save();
     await chat.addUsers(userIds);
   } catch(error)  {
     return res.status(400).send(error.errors[0].message);
   }
+
+  // get mapping of userId to socket id 
+  const id_to_socket = res.app.get('id_to_socket');
+  // get socket ids of online users
+  const socket_ids = userIds.filter(item => {
+    if (!id_to_socket.get(item)) return false;
+    return true;
+  }).map(item => id_to_socket.get(item));
+
+  // broadcast 'chat joined' to all online users belonging to chat
+  socket_ids.map(id => { res.app.get('socketio').sockets.connected[id].join(chat.id) });
+  res.app.get('socketio').to(chat.id).emit('chat joined', { 
+    "chatId": chat.id,
+    "name": chat.name
+  });
   return res.send({ "chat": chat.id });
 });
 

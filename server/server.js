@@ -29,6 +29,15 @@ const io = require('socket.io')(http);
 const wrap = middleware => (socket, next) => middleware(socket.request, {}, next);
 const id_to_socket = new Map();
 
+app.set('socketio', io);
+app.set('id_to_socket', id_to_socket);
+// add socket io to res
+// app.use((req, res, next) => {
+//   res.io = io;
+//   res.id_to_socket = () => { return id_to_socket};
+//   next();
+// });
+
 async function assertDatabaseConnection() {
   try {
     await sequelize.authenticate();
@@ -37,7 +46,7 @@ async function assertDatabaseConnection() {
     console.log('Connection to Db Failed:');
     console.log(error.message);
   }
-  // sequelize.sync();
+  sequelize.sync();
 }
 // establish connection to database
 assertDatabaseConnection();
@@ -61,7 +70,7 @@ io.use((socket, next) => {
 
 io.on('connection', async (socket) => {
   console.log('user connected');
-  id_to_socket[socket.userId] = socket.id;
+  id_to_socket.set(socket.userId, socket.id);
 
   // get chats belonging to a user
   const chats = await sequelize.models.UserChats.findAll({
@@ -90,6 +99,7 @@ io.on('connection', async (socket) => {
 
   socket.on('disconnect', () => {
     console.log('user disconnected');
+    id_to_socket.delete(socket.userId);
   });
 })
 

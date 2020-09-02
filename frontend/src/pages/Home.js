@@ -97,7 +97,7 @@ function Home() {
 
     // message event
     socket.on('message', (data) =>  {
-      console.log(data);
+      // console.log(data);
       dispatchMessageList({
         type: 'APPEND_TO_STATE',
         payload: data

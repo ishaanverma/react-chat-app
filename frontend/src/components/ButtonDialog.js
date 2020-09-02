@@ -82,7 +82,6 @@ const UserDialog = ({ open, onClose, userList }) => {
     }
 
     setChecked(newChecked);
-    console.log(newChecked);
   };
 
   // keep track of chat name
@@ -96,13 +95,11 @@ const UserDialog = ({ open, onClose, userList }) => {
       setError(true);
       return;
     }
-    console.log(name);
-    console.log(checked);
+    // TODO: handle errors
     const result = await axios.post('/chats/create', {
       "name": name,
       "members": checked
     });
-    console.log(result);
     setChecked([]);
     setName('');
     onClose();
