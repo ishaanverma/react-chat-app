@@ -17,7 +17,10 @@ const DisplayDataWithList = ({ listData, icon, click }) =>
       listData.data.map((item, index) => {
         return(
           <React.Fragment key={index}>
-            <ListItem button onClick={click(item)}>
+            <ListItem 
+              button 
+              onClick={!click ? undefined : click(item)}
+            >
               <ListItemAvatar>
                 <Avatar component={icon} />
               </ListItemAvatar>

@@ -3,8 +3,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import axios from 'axios';
 import Grid from '@material-ui/core/Grid';
 import io from 'socket.io-client';
-import ChatUserList from '../components/ChatUserList';
-import MessageList from '../components/MessageList';
+// import { Map } from 'immutable';
+import ChatsContainer from '../components/ChatsContainer';
+import MessagesContainer from '../components/MessagesContainer';
 import { apiReducerWithState } from '../reducer/apiReducerWithState';
 import { ChatInfoContext } from '../context/chatInfo';
 
@@ -21,6 +22,7 @@ function Home() {
   const classes = useStyles();
   const [socket, setSocket] = useState();
   const { chatInfo } = useContext(ChatInfoContext);
+  // const [lastMessageList, setLastMessageList] = useState(Map());
   const [messages, dispatchMessageList] = useReducer(apiReducerWithState, {
     data: [],
     isLoading: false,
@@ -50,6 +52,8 @@ function Home() {
       type: "APPEND_TO_STATE",
       payload: data
     });
+    // setLastMessageList(lastMessageList => lastMessageList.set(data.chatId, data.content));
+    // localStorage.setItem('messages', lastMessageList);
     socket.emit('message', JSON.stringify(data));
   }
 
@@ -63,7 +67,7 @@ function Home() {
         payload: result.data
       });
     } catch {
-      dispatchChatList({ type: "API_FETCH_ERROR"});
+      dispatchChatList({ type: "API_FETCH_ERROR" });
     }
   }
 
@@ -81,7 +85,7 @@ function Home() {
         payload: messageResult.data
       });
     } catch {
-      dispatchMessageList({ type: "API_FETCH_ERROR"});
+      dispatchMessageList({ type: "API_FETCH_ERROR" });
     }
   }
 
@@ -98,10 +102,13 @@ function Home() {
     // message event
     socket.on('message', (data) =>  {
       // console.log(data);
-      dispatchMessageList({
-        type: 'APPEND_TO_STATE',
-        payload: data
-      });
+      if (chatInfo.chatId === data.chatId)
+        dispatchMessageList({
+          type: 'APPEND_TO_STATE',
+          payload: data
+        });
+      // setLastMessageList(lastMessageList => lastMessageList.set(data.chatId, data.content));
+      // localStorage.setItem('messages', lastMessageList);
     });
 
     // chat joined event
@@ -112,7 +119,7 @@ function Home() {
       });
     });
 
-  }, [socket])
+  }, [socket, chatInfo.chatId])
 
   useEffect(() => {
     handleMessageList(chatInfo.chatId);
@@ -122,10 +129,10 @@ function Home() {
     <Grid container className={classes.root} spacing={0}>
       <Grid container spacing={0}>
         <Grid item xs>
-          <ChatUserList list={chatList} />
+          <ChatsContainer list={chatList} />
         </Grid>
         <Grid item xs={9}>
-          <MessageList list={messages.data} submit={handleMessageSubmit} />
+          <MessagesContainer list={messages.data} submit={handleMessageSubmit} />
         </Grid>
       </Grid>
     </Grid>  

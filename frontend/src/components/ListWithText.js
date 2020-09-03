@@ -15,6 +15,7 @@ const ListWithText = ({ listData, click, data, icon, change, error }) =>
       label="Chat Name"
       variant="outlined"
       margin="normal"
+      value={data.name}
       onChange={change}
       error={error}
       required
@@ -36,7 +37,7 @@ const ListWithText = ({ listData, click, data, icon, change, error }) =>
                 <Checkbox
                   edge="end"
                   onChange={click(item)}
-                  checked={data.indexOf(item) !== -1}
+                  checked={data.checked.indexOf(item) !== -1}
                   tabIndex={-1}
                 />
               </ListItemSecondaryAction>

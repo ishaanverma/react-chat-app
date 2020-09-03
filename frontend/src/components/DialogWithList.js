@@ -33,16 +33,18 @@ const DialogWithList = ({ open, onClose, userList }) => {
   };
 
   // send name and checked when clicked
-  const handleOk = async () => {
-    if (!name) {
+  const handleOk = async (event) => {
+    event.preventDefault();
+    try {
+      await axios.post('/chats/create', {
+        "name": name,
+        "members": checked
+      });
+    } catch {
       setError(true);
       return;
     }
-    // TODO: handle errors
-    const result = await axios.post('/chats/create', {
-      "name": name,
-      "members": checked
-    });
+
     setChecked([]);
     setName('');
     onClose();
@@ -54,25 +56,27 @@ const DialogWithList = ({ open, onClose, userList }) => {
       maxWidth="sm"
       open={open}
     >
-      <DialogTitle>Create New Chat</DialogTitle>
-      <DialogContent dividers>
-        <ListWithText
-          listData={userList}
-          click={handleToggle}
-          change={handleTextChange}
-          data={checked}
-          icon={AccountCircleIcon}
-          error={error}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Cancel
-        </Button>
-        <Button color="primary" onClick={handleOk}>
-          Ok
-        </Button>
-      </DialogActions>
+      <form onSubmit={handleOk}>
+        <DialogTitle>Create New Chat</DialogTitle>
+        <DialogContent dividers>
+          <ListWithText
+            listData={userList}
+            click={handleToggle}
+            change={handleTextChange}
+            data={{checked, name}}
+            icon={AccountCircleIcon}
+            error={error}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onClose} color="primary">
+            Cancel
+          </Button>
+          <Button color="primary" type="submit">
+            Ok
+          </Button>
+        </DialogActions>
+      </form>
     </Dialog>
   );
 }
