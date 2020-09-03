@@ -22,7 +22,7 @@ function Home() {
   const classes = useStyles();
   const [socket, setSocket] = useState();
   const { chatInfo } = useContext(ChatInfoContext);
-  // const [lastMessageList, setLastMessageList] = useState(Map());
+  const [lastMessageList, setLastMessageList] = useState({});
   const [messages, dispatchMessageList] = useReducer(apiReducerWithState, {
     data: [],
     isLoading: false,
@@ -52,8 +52,10 @@ function Home() {
       type: "APPEND_TO_STATE",
       payload: data
     });
-    // setLastMessageList(lastMessageList => lastMessageList.set(data.chatId, data.content));
-    // localStorage.setItem('messages', lastMessageList);
+    setLastMessageList(prevState => ({
+      ...prevState,
+      [data.chatId]: data.content
+    }));
     socket.emit('message', JSON.stringify(data));
   }
 
@@ -107,8 +109,11 @@ function Home() {
           type: 'APPEND_TO_STATE',
           payload: data
         });
-      // setLastMessageList(lastMessageList => lastMessageList.set(data.chatId, data.content));
-      // localStorage.setItem('messages', lastMessageList);
+
+      setLastMessageList(prevState => ({
+        ...prevState,
+        [data.chatId]: data.content
+      }));
     });
 
     // chat joined event
@@ -129,7 +134,7 @@ function Home() {
     <Grid container className={classes.root} spacing={0}>
       <Grid container spacing={0}>
         <Grid item xs>
-          <ChatsContainer list={chatList} />
+          <ChatsContainer primaryList={chatList} secondaryList={lastMessageList} />
         </Grid>
         <Grid item xs={9}>
           <MessagesContainer list={messages.data} submit={handleMessageSubmit} />

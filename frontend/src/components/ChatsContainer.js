@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ChatsContainer({ list }) {
+function ChatsContainer({ primaryList, secondaryList }) {
   const classes = useStyles();
   const { chatInfo, setChatInfo } = useContext(ChatInfoContext);
   
@@ -37,7 +37,7 @@ function ChatsContainer({ list }) {
         <AppBarWithTitle title="Chats" />
         <ButtonWithDialog />
         <DisplayDataWithList 
-          listData={list}
+          listData={{primaryList, secondaryList}}
           click={handleListClick}
           icon={ChatIcon}
         />

@@ -10,11 +10,11 @@ import ListItemText from '@material-ui/core/ListItemText';
 const DisplayDataWithList = ({ listData, icon, click }) => 
   <List>
     <Divider />
-    {listData.isError && <p>Error</p>}
-    {listData.isLoading ? (
+    {listData.primaryList.isError && <p>Error</p>}
+    {listData.primaryList.isLoading ? (
       <LinearProgress />
     ) : (
-      listData.data.map((item, index) => {
+      listData.primaryList.data.map((item, index) => {
         return(
           <React.Fragment key={index}>
             <ListItem 
@@ -24,8 +24,7 @@ const DisplayDataWithList = ({ listData, icon, click }) =>
               <ListItemAvatar>
                 <Avatar component={icon} />
               </ListItemAvatar>
-              {/* <ListItemText primary={item.name} secondary={lastMessage.get(item.chatId)} /> */}
-              <ListItemText primary={item.name} />
+              <ListItemText primary={item.name} secondary={listData.secondaryList[item.chatId]} />
             </ListItem>
             <Divider />
           </React.Fragment>
