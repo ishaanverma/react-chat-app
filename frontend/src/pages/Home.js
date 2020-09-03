@@ -137,7 +137,7 @@ function Home() {
           <ChatsContainer primaryList={chatList} secondaryList={lastMessageList} />
         </Grid>
         <Grid item xs={9}>
-          <MessagesContainer list={messages.data} submit={handleMessageSubmit} />
+          <MessagesContainer list={messages} submit={handleMessageSubmit} />
         </Grid>
       </Grid>
     </Grid>  

@@ -13,6 +13,7 @@ import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import SendRoundedIcon from '@material-ui/icons/SendRounded';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import { ChatInfoContext } from '../context/chatInfo';
 import AppBarWithTitle from './AppBarWithTitle';
 
@@ -76,19 +77,24 @@ function MessageList({ list, submit })  {
       <Grid item className={classes.messagesGridItem}>
         <Container maxWidth={false} disableGutters className={classes.messagesContainer}>
           <List className={classes.list}>
-            {list.map((item, index) => (
-              <React.Fragment key={index}>
-                <ListItem>
-                  <ListItemAvatar>
-                    <Avatar>
-                      <AccountCircleIcon />
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText primary={item.content} secondary={item.User.name} />
-                </ListItem>
-                <Divider />
-              </React.Fragment>
-            ))}
+            {list.isError && <p>Error</p>}
+            {list.isLoading ? (
+              <LinearProgress />
+            ) : (
+              list.data.map((item, index) => 
+                <React.Fragment key={index}>
+                  <ListItem>
+                    <ListItemAvatar>
+                      <Avatar>
+                        <AccountCircleIcon />
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText primary={item.content} secondary={item.User.name} />
+                  </ListItem>
+                  <Divider />
+                </React.Fragment>
+              )
+            )}
           </List>
         </Container>
       </Grid>
