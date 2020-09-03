@@ -1,9 +1,5 @@
 import React, { useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
@@ -18,6 +14,7 @@ import IconButton from '@material-ui/core/IconButton';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import SendRoundedIcon from '@material-ui/icons/SendRounded';
 import { ChatInfoContext } from '../context/chatInfo';
+import AppBarWithTitle from './AppBarWithTitle';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -60,9 +57,6 @@ const useStyles = makeStyles((theme) => ({
     height: '100%',
     overflow: 'auto',
   },
-  appBarText: {
-    flexGrow: 1,
-  },
   messageBarContainer: {
     flex: 'auto 1 auto',
     padding: 0,
@@ -76,7 +70,7 @@ function MessageList({ list, submit })  {
   return(
     <Grid container direction="column" className={classes.root}>
       <Grid item className={classes.messageBarContainer}>
-        <MessageAppBar chatName={chatInfo.chatName} />
+        <AppBarWithTitle title={chatInfo.chatName} />
       </Grid>
       
       <Grid item className={classes.messagesGridItem}>
@@ -122,25 +116,6 @@ function MessageList({ list, submit })  {
         </Paper>
       </Grid>
     </Grid>
-  );
-}
-
-const MessageAppBar = ({ chatName='' }) => {
-  const classes = useStyles();
-
-  return (
-    <Container maxWidth={false} disableGutters={true}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography className={classes.appBarText}>
-            {chatName}
-          </Typography>
-          <Button variant="outlined" color="inherit">
-            Logout
-          </Button>
-        </Toolbar>
-      </AppBar>
-    </Container>
   );
 }
 
