@@ -54,7 +54,7 @@ function Login() {
     } catch(err)  {
       console.log(err);
     }
-    console.log(result.data.name);
+
     setTimeout(() => {}, 5000);
     if (result && result.status === 200)  {
       setAuthenticated(true);
