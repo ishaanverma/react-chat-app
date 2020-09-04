@@ -46,7 +46,7 @@ async function assertDatabaseConnection() {
     console.log('Connection to Db Failed:');
     console.log(error.message);
   }
-  sequelize.sync();
+  // sequelize.sync();
 }
 // establish connection to database
 assertDatabaseConnection();

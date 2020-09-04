@@ -106,11 +106,12 @@ function MessageList({ list, submit, socket })  {
 
     // typing events
     socket.on('start typing', (data) => {
-      setTyping(prevState => ({
-        ...prevState,
-        'start': true,
-        'name': data.name
-      }));
+      if (chatInfo.chatId === data.chatId)
+        setTyping(prevState => ({
+          ...prevState,
+          'start': true,
+          'name': data.name
+        }));
     });
 
     socket.on('stop typing', (data) => {
@@ -120,7 +121,7 @@ function MessageList({ list, submit, socket })  {
       }));
     });
 
-  }, [socket])
+  }, [socket, chatInfo.chatId])
 
   return(
     <Grid container direction="column" className={classes.root}>
