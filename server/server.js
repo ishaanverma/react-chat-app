@@ -97,6 +97,14 @@ io.on('connection', async (socket) => {
     socket.to(data.chatId).emit('message', data);
   });
 
+  socket.on('start typing', (data) => {
+    socket.to(data.chatId).emit('start typing', data);
+  });
+
+  socket.on('stop typing', (data) => {
+    socket.to(data.chatId).emit('stop typing', data);
+  });
+
   socket.on('disconnect', () => {
     console.log('user disconnected');
     id_to_socket.delete(socket.userId);

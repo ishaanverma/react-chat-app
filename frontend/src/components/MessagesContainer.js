@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
@@ -16,7 +16,9 @@ import SendRoundedIcon from '@material-ui/icons/SendRounded';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { ChatInfoContext } from '../context/chatInfo';
 import AppBarWithTitle from './AppBarWithTitle';
+import { Snackbar } from '@material-ui/core';
 
+const WAIT_INTERVAL = 2000;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -64,9 +66,54 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function MessageList({ list, submit })  {
+function MessageList({ list, submit, socket })  {
   const classes = useStyles();
+  const typingTimeout = useRef();
+  const [typingFlag, setTypingFlag] = useState(false);
+  const [typing, setTyping] = useState({});
   const { chatInfo } = useContext(ChatInfoContext);
+
+  const handleKeyPress = (event) => {
+    if (event.keyCode !== 13) {
+      clearTimeout(typingTimeout.current);
+
+      if (typingFlag === false) {
+        socket.emit('start typing', {
+          'chatId': chatInfo.chatId,
+          'name': chatInfo.username,
+        });
+        setTypingFlag(true);
+      }
+
+      typingTimeout.current = setTimeout(() => {
+        socket.emit('stop typing', {
+          'chatId': chatInfo.chatId,
+        });
+        setTypingFlag(false);
+      }, WAIT_INTERVAL);
+    }    
+  }
+
+  useEffect(() => {
+    if (!socket) return;
+
+    // typing events
+    socket.on('start typing', (data) => {
+      setTyping(prevState => ({
+        ...prevState,
+        'start': true,
+        'name': data.name
+      }));
+    });
+
+    socket.on('stop typing', (data) => {
+      setTyping(prevState => ({
+        ...prevState,
+        'start': false,
+      }));
+    });
+
+  }, [socket])
 
   return(
     <Grid container direction="column" className={classes.root}>
@@ -98,7 +145,7 @@ function MessageList({ list, submit })  {
           </List>
         </Container>
       </Grid>
-      
+      <Snackbar open={typing.start} message={`${typing.name} is typing`} style={{ bottom: '20%' }}/>
       <Grid item className={classes.sendBarContainer}>
         <Paper 
           component="form" 
@@ -112,6 +159,7 @@ function MessageList({ list, submit })  {
             className={classes.sendInput}
             placeholder="Send a message"
             disabled={chatInfo.chatId ? false : true}
+            onKeyPress={handleKeyPress}
           />
           <IconButton 
             type="submit"
