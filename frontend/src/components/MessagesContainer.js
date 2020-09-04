@@ -69,6 +69,7 @@ const useStyles = makeStyles((theme) => ({
 function MessageList({ list, submit, socket })  {
   const classes = useStyles();
   const typingTimeout = useRef();
+  const messageEndRef = useRef();
   const [typingFlag, setTypingFlag] = useState(false);
   const [typing, setTyping] = useState({});
   const { chatInfo } = useContext(ChatInfoContext);
@@ -93,6 +94,12 @@ function MessageList({ list, submit, socket })  {
       }, WAIT_INTERVAL);
     }    
   }
+
+  const scrollToBottom = () => {
+    messageEndRef.current.scrollIntoView({ behavior: "auto" });
+  }
+
+  useEffect(scrollToBottom, [list.data]);
 
   useEffect(() => {
     if (!socket) return;
@@ -142,7 +149,9 @@ function MessageList({ list, submit, socket })  {
                 </React.Fragment>
               )
             )}
+            <div ref={messageEndRef} />
           </List>
+          
         </Container>
       </Grid>
       <Snackbar open={typing.start} message={`${typing.name} is typing`} style={{ bottom: '20%' }}/>
