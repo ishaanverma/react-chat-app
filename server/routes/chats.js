@@ -52,4 +52,20 @@ router.get('/all', isAuthenticated, async (req, res) => {
   res.status(200).send(chats);
 });
 
+router.get('/members/:chatId', isAuthenticated, async (req, res) => {
+  // TODO check if req.userId is in the requested chat
+  const chatId = req.params.chatId;
+  const chats = await models.Chat.findOne({
+    where: {
+      id: chatId,
+    },
+  });
+  const users = await chats.getUsers({
+    attributes: [["id", "UserId"], "name"],
+    joinTableAttributes: ["ChatId"]
+  });
+
+  res.status(200).send(users);
+});
+
 module.exports = router;

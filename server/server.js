@@ -31,12 +31,6 @@ const id_to_socket = new Map();
 
 app.set('socketio', io);
 app.set('id_to_socket', id_to_socket);
-// add socket io to res
-// app.use((req, res, next) => {
-//   res.io = io;
-//   res.id_to_socket = () => { return id_to_socket};
-//   next();
-// });
 
 async function assertDatabaseConnection() {
   try {

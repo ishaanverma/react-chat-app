@@ -14,6 +14,7 @@ import IconButton from '@material-ui/core/IconButton';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import SendRoundedIcon from '@material-ui/icons/SendRounded';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import UserDrawer from './UserDrawer';
 import { ChatInfoContext } from '../context/chatInfo';
 import AppBarWithTitle from './AppBarWithTitle';
 import { Snackbar } from '@material-ui/core';
@@ -126,7 +127,9 @@ function MessageList({ list, submit, socket })  {
   return(
     <Grid container direction="column" className={classes.root}>
       <Grid item className={classes.messageBarContainer}>
-        <AppBarWithTitle title={chatInfo.chatName} />
+        <AppBarWithTitle title={chatInfo.chatName}>
+          <UserDrawer />
+        </AppBarWithTitle>
       </Grid>
       
       <Grid item className={classes.messagesGridItem}>
