@@ -14,10 +14,11 @@ import IconButton from '@material-ui/core/IconButton';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import SendRoundedIcon from '@material-ui/icons/SendRounded';
 import LinearProgress from '@material-ui/core/LinearProgress';
+import Snackbar from '@material-ui/core/Snackbar';
 import UserDrawer from './UserDrawer';
 import { ChatInfoContext } from '../context/chatInfo';
 import AppBarWithTitle from './AppBarWithTitle';
-import { Snackbar } from '@material-ui/core';
+import { ReactComponent as HomeSvg } from '../images/home.svg';
 
 const WAIT_INTERVAL = 2000;
 
@@ -97,7 +98,8 @@ function MessageList({ list, submit, socket })  {
   }
 
   const scrollToBottom = () => {
-    messageEndRef.current.scrollIntoView({ behavior: "auto" });
+    if (messageEndRef.current)
+      messageEndRef.current.scrollIntoView({ behavior: "auto" });
   }
 
   useEffect(scrollToBottom, [list.data]);
@@ -133,6 +135,14 @@ function MessageList({ list, submit, socket })  {
       </Grid>
       
       <Grid item className={classes.messagesGridItem}>
+        {!chatInfo.chatId && 
+          <Container maxWidth={false} disableGutters style={{ 
+            margin: '1em auto'
+          }}>
+            <HomeSvg height="60vh" />
+          </Container>
+        }
+        {chatInfo.chatId && 
         <Container maxWidth={false} disableGutters className={classes.messagesContainer}>
           <List className={classes.list}>
             {list.isError && <p>Error</p>}
@@ -155,8 +165,8 @@ function MessageList({ list, submit, socket })  {
             )}
             <div ref={messageEndRef} />
           </List>
-          
         </Container>
+        }
       </Grid>
       <Snackbar open={typing.start} message={`${typing.name} is typing`} style={{ bottom: '20%' }}/>
       <Grid item className={classes.sendBarContainer}>

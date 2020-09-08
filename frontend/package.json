@@ -16,8 +16,7 @@
     "react-scripts": "3.4.3",
     "react-window": "^1.8.5",
     "socket.io-client": "^2.3.0",
-    "webfontloader": "^1.6.28",
-    "ws": "^7.3.1"
+    "webfontloader": "^1.6.28"
   },
   "scripts": {
     "start": "react-scripts start",
