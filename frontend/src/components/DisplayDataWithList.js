@@ -7,8 +7,11 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import ListItemText from '@material-ui/core/ListItemText';
 
-const DisplayDataWithList = ({ listData, icon, click }) => 
-  <List>
+const DisplayDataWithList = ({ listData, icon, click, ...props }) => 
+  <List
+    hidden={props.value !== props.index}
+    style={{ padding: 0 }}
+  >
     <Divider />
     {listData.primaryList.isError && <p>Error</p>}
     {listData.primaryList.isLoading ? (

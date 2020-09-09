@@ -13,6 +13,10 @@ import ButtonWithDialog from './ButtonWithDialog';
 import { ChatInfoContext } from '../context/chatInfo';
 import DisplayDataWithList from './DisplayDataWithList';
 
+import AppBar from '@material-ui/core/AppBar';
+import Tab from '@material-ui/core/Tab';
+import Tabs from '@material-ui/core/tabs';
+
 const useStyles = makeStyles((theme) => ({
   list: {
     width: '100%',
@@ -30,6 +34,7 @@ function ChatsContainer({ primaryList, secondaryList }) {
   const classes = useStyles();
   const { chatInfo, setChatInfo } = useContext(ChatInfoContext);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [value, setValue] = useState(0);
   
   const handleListClick = (item) => () => {
     setChatInfo({ 
@@ -69,11 +74,35 @@ function ChatsContainer({ primaryList, secondaryList }) {
             </Menu>
           </>
         </AppBarWithTitle>
-        <ButtonWithDialog />
+        <div>
+          <AppBar 
+            square 
+            style={{ width: '100%' }} 
+            position="static"
+            color="inherit"
+          >
+            <Tabs
+              value={value}
+              indicatorColor="primary"
+              textColor="primary"
+              onChange={(event, newValue) => setValue(newValue)}
+              aria-label="disabled tabs example"
+              variant="fullWidth"
+              centered
+            >
+              <Tab label="Chats" />
+              <Tab label="Users" />
+            </Tabs>
+          </AppBar>
+        </div>
+        <ButtonWithDialog value={value} index={1}/>
         <DisplayDataWithList 
           listData={{primaryList, secondaryList}}
           click={handleListClick}
           icon={ChatIcon}
+          style={{ display: 'flex' }}
+          value={value}
+          index={0}
         />
       </Container>
     </>

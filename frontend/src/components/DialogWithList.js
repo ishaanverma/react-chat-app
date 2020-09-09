@@ -1,14 +1,11 @@
 import React from 'react';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogActions from '@material-ui/core/DialogActions';
+import Container from '@material-ui/core/Container';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ListWithText from './ListWithText';
 
-const DialogWithList = ({ open, onClose, userList }) => {
+const DialogWithList = ({ userList, ...props }) => {
   const [error, setError] = React.useState(false);
   const [name, setName] = React.useState("");
   const [checked, setChecked] = React.useState([]);
@@ -47,37 +44,26 @@ const DialogWithList = ({ open, onClose, userList }) => {
 
     setChecked([]);
     setName('');
-    onClose();
   };
   // TODO: make a form with validation
   return (
-    <Dialog
-      fullWidth={true}
-      maxWidth="sm"
-      open={open}
+    <Container
+      hidden={props.value !== props.index}
     >
-      <form onSubmit={handleOk}>
-        <DialogTitle>Create New Chat</DialogTitle>
-        <DialogContent dividers>
-          <ListWithText
-            listData={userList}
-            click={handleToggle}
-            change={handleTextChange}
-            data={{checked, name}}
-            icon={AccountCircleIcon}
-            error={error}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} color="primary">
-            Cancel
-          </Button>
-          <Button color="primary" type="submit">
-            Ok
-          </Button>
-        </DialogActions>
+      <form onSubmit={handleOk} hidden={props.value !== props.index}>
+        <ListWithText
+          listData={userList}
+          click={handleToggle}
+          change={handleTextChange}
+          data={{checked, name}}
+          icon={AccountCircleIcon}
+          error={error}
+        />
+        <Button color="primary" type="submit">
+          Ok
+        </Button>
       </form>
-    </Dialog>
+    </Container>
   );
 }
 

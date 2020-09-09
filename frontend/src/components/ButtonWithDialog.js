@@ -1,24 +1,9 @@
-import React, { useState, useReducer } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import axios from 'axios';
-import { makeStyles } from '@material-ui/core/styles';
-import Button from '@material-ui/core/Button';
 import DialogWithList from './DialogWithList';
 import { apiReducer } from '../reducer/apiReducer';
 
-const useStyles = makeStyles((theme) => ({
-  buttonContainer: {
-    padding: '0.5em 1em',
-    marginLeft: 'auto',
-    marginRight: 'auto'
-  },
-  dialogContainer: {
-    padding: '1em'
-  }
-}));
-
-const ButtonWithDialog = () => {
-  const classes = useStyles();
-  const [open, setOpen] = useState(false);
+const ButtonWithDialog = (props) => {
   const [userList, dispatchUserList] = useReducer(apiReducer, {
     data: [],
     isLoading: false,
@@ -26,7 +11,6 @@ const ButtonWithDialog = () => {
   });
 
   const handleButton = async () => {
-    setOpen(true);
     dispatchUserList({ type: "API_FETCH_INIT" });
     const result = await axios.get('/users/all');
 
@@ -40,15 +24,12 @@ const ButtonWithDialog = () => {
     }
   }
 
-  const handleClose = () => {
-    setOpen(false);
-  }
+  useEffect(() => {
+    handleButton();
+  }, [props.value])
 
   return(
-    <div className={classes.buttonContainer}>
-      <Button variant="outlined" onClick={handleButton}>New Chat</Button>
-      <DialogWithList open={open} onClose={handleClose} userList={userList}/>
-    </div>
+    <DialogWithList value={props.value} index={props.index} userList={userList}/>
   );
 }
 
