@@ -88,8 +88,7 @@ io.on('connection', async (socket) => {
   const chatIds = chats.map((item) => item.dataValues.ChatId.toString());
   socket.join(chatIds);
   socket.broadcast.emit('online', {
-    'UserId': socket.userId,
-    'username': id_to_name.get(socket.userId),
+    'userId': socket.userId,
     'status': 'online'
   })
 

@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
   colorPrimary: "#44b700"
 }));
 
-function ChatsContainer({ primaryList, secondaryList }) {
+function ChatsContainer({ primaryList, secondaryList, onlineList }) {
   const classes = useStyles();
   const { chatInfo, setChatInfo } = useContext(ChatInfoContext);
   const [value, setValue] = useState(0);
@@ -69,7 +69,7 @@ function ChatsContainer({ primaryList, secondaryList }) {
         value={value}
         index={0}
       />
-      <UserList value={value} index={1}/>
+      <UserList onlineList={onlineList} value={value} index={1}/>
     </Container>
   );
 }

@@ -23,6 +23,7 @@ function Home() {
   const [socket, setSocket] = useState();
   const { chatInfo } = useContext(ChatInfoContext);
   const [lastMessageList, setLastMessageList] = useState({});
+  const [onlineList, setOnlineList] = useState(new Map());
   const [messages, dispatchMessageList] = useReducer(apiReducerWithState, {
     data: [],
     isLoading: false,
@@ -123,8 +124,19 @@ function Home() {
 
     // user online event
     socket.on('online', (data) => {
-      console.log(data);
+      setOnlineList(prevState => ({
+        ...prevState,
+        [data.userId]: data.status,
+      }));
     });
+
+    // user offline event
+    socket.on('offline', (data) => {
+      setOnlineList(prevState => ({
+        ...prevState,
+        [data.userId]: data.status
+      }));
+    })
 
   }, [socket, chatInfo.chatId])
 
@@ -136,7 +148,11 @@ function Home() {
     <Grid container className={classes.root} spacing={0}>
       <Grid container spacing={0}>
         <Grid item xs>
-          <ChatsContainer primaryList={chatList} secondaryList={lastMessageList} />
+          <ChatsContainer 
+            primaryList={chatList} 
+            secondaryList={lastMessageList}
+            onlineList={onlineList}
+          />
         </Grid>
         <Grid item xs={9}>
           <MessagesContainer 

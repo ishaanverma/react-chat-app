@@ -15,6 +15,7 @@ const UserList = (props) => {
     isLoading: false,
     isError: false
   });
+  const onlineList = props.onlineList;
 
   const handleButton = async () => {
     dispatchUserList({ type: "API_FETCH_INIT" });
@@ -74,7 +75,7 @@ const UserList = (props) => {
     >
       <form onSubmit={handleOk} hidden={props.value !== props.index}>
         <ListWithText
-          listData={userList}
+          listData={{userList, onlineList}}
           click={handleToggle}
           change={handleTextChange}
           data={{checked, name}}
