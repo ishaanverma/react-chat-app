@@ -52,9 +52,10 @@ const UserDrawer = () => {
         <Toolbar>
           <Typography>Chat Members</Typography>
         </Toolbar>
-        <Divider />
+        
         <div style={{ width: 250 }}>
           <List>
+            <Divider />
             {users.isError && <p>Error</p>}
             {users.isLoading ? (
               <LinearProgress />
