@@ -11,7 +11,7 @@ import { ChatInfoContext } from '../context/chatInfo';
 
 const ENDPOINT = process.env.WEBSOCKET_ENDPOINT || 'http://localhost:5000';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
     height: '100vh'
@@ -43,9 +43,6 @@ function Home() {
       "content": message,
       "createdAt": "null",
       "chatId": chatInfo.chatId,
-      "User": {
-        "name": chatInfo.username
-      }
     }
     event.target.message.value = '';
     dispatchMessageList({
@@ -122,6 +119,11 @@ function Home() {
         type: 'APPEND_TO_STATE',
         payload: data
       });
+    });
+
+    // user online event
+    socket.on('online', (data) => {
+      console.log(data);
     });
 
   }, [socket, chatInfo.chatId])

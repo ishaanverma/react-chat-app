@@ -39,7 +39,7 @@ function ChatsContainer({ primaryList, secondaryList }) {
   }
 
   return(
-    <Container className={classes.list} maxWidth={false} disableGutters={true}>
+    <Container className={classes.list} maxWidth={false} disableGutters>
       <AppBarWithTitle title="Chats">
         <UserMenu />
       </AppBarWithTitle>
@@ -55,7 +55,7 @@ function ChatsContainer({ primaryList, secondaryList }) {
           textColor="primary"
           onChange={(event, newValue) => setValue(newValue)}
           aria-label="disabled tabs example"
-          variant="fullWidth"
+          variant="standard"
           centered
         >
           <Tab label="Chats" />

@@ -83,7 +83,6 @@ function MessageList({ list, submit, socket })  {
       if (typingFlag === false) {
         socket.emit('start typing', {
           'chatId': chatInfo.chatId,
-          'name': chatInfo.username,
         });
         setTypingFlag(true);
       }
@@ -157,7 +156,7 @@ function MessageList({ list, submit, socket })  {
                         <AccountCircleIcon />
                       </Avatar>
                     </ListItemAvatar>
-                    <ListItemText primary={item.content} secondary={item.User.name} />
+                    <ListItemText primary={item.content} secondary={item.User ? item.User.name : chatInfo.username} />
                   </ListItem>
                   <Divider />
                 </React.Fragment>
@@ -168,7 +167,7 @@ function MessageList({ list, submit, socket })  {
         </Container>
         }
       </Grid>
-      <Snackbar open={typing.start} message={`${typing.name} is typing`} style={{ bottom: '20%' }}/>
+      <Snackbar open={typing.start} message={`${typing.name} is typing...`} style={{ bottom: '20%' }}/>
       <Grid item className={classes.sendBarContainer} hidden={chatInfo.chatId ? false : true}>
         <Paper 
           component="form" 

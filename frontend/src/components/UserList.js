@@ -62,10 +62,8 @@ const UserList = (props) => {
         "members": checked
       });
     } catch {
-      setError(true);
-      return;
+      return setError(true);
     }
-
     setChecked([]);
     setName('');
   };
