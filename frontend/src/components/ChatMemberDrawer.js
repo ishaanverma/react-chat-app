@@ -15,7 +15,7 @@ import { apiReducerWithState } from '../reducer/apiReducerWithState';
 import { ChatInfoContext } from '../context/chatInfo';
 import { Divider } from '@material-ui/core';
 
-const UserDrawer = () => {
+const ChatMemberDrawer = () => {
   const [open, setOpen] = useState(false);
   const { chatInfo } = useContext(ChatInfoContext);
   const [users, dispatchUserList] = useReducer(apiReducerWithState, {
@@ -79,4 +79,4 @@ const UserDrawer = () => {
   );
 }
 
-export default UserDrawer;
+export default ChatMemberDrawer;

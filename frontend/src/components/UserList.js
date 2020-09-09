@@ -1,16 +1,40 @@
-import React from 'react';
+import React, { useReducer, useEffect } from 'react';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ListWithText from './ListWithText';
+import { apiReducer } from '../reducer/apiReducer';
 
-const DialogWithList = ({ userList, ...props }) => {
+const UserList = (props) => {
   const [error, setError] = React.useState(false);
   const [name, setName] = React.useState("");
   const [checked, setChecked] = React.useState([]);
+  const [userList, dispatchUserList] = useReducer(apiReducer, {
+    data: [],
+    isLoading: false,
+    isError: false
+  });
 
-  // keep track of selected items in Dialog
+  const handleButton = async () => {
+    dispatchUserList({ type: "API_FETCH_INIT" });
+    const result = await axios.get('/users/all');
+
+    try {
+      dispatchUserList({ 
+        type: "API_FETCH_SUCCESS",
+        payload: result.data
+      });
+    } catch(err) {
+      dispatchUserList({ type: "API_FETCH_ERROR" });
+    }
+  }
+
+  useEffect(() => {
+    handleButton();
+  }, [props.value])
+
+  // keep track of selected items
   const handleToggle = (value) => () => {
     const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
@@ -45,8 +69,8 @@ const DialogWithList = ({ userList, ...props }) => {
     setChecked([]);
     setName('');
   };
-  // TODO: make a form with validation
-  return (
+
+  return(
     <Container
       hidden={props.value !== props.index}
     >
@@ -67,4 +91,4 @@ const DialogWithList = ({ userList, ...props }) => {
   );
 }
 
-export default DialogWithList;
+export default UserList;
