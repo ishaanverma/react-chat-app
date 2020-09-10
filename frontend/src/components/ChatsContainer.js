@@ -1,16 +1,18 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useReducer } from 'react';
+import axios from 'axios';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import ChatIcon from '@material-ui/icons/Chat';
-import AppBarWithTitle from './AppBarWithTitle';
-import UserList from './UserList';
-import { ChatInfoContext } from '../context/chatInfo';
-import ChatList from './ChatList';
-import UserMenu from './UserMenu';
-
 import AppBar from '@material-ui/core/AppBar';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/tabs';
+import AppBarWithTitle from './AppBarWithTitle';
+import UserList from './UserList';
+import { ChatInfoContext } from '../context/chatInfo';
+import { apiReducer } from '../reducer/apiReducer';
+import ChatList from './ChatList';
+import UserMenu from './UserMenu';
+
 
 const useStyles = makeStyles((theme) => ({
   list: {
@@ -29,6 +31,11 @@ function ChatsContainer({ primaryList, secondaryList, onlineList }) {
   const classes = useStyles();
   const { chatInfo, setChatInfo } = useContext(ChatInfoContext);
   const [value, setValue] = useState(0);
+  const [userList, dispatchUserList] = useReducer(apiReducer, {
+    data: [],
+    isLoading: false,
+    isError: false
+  });
   
   const handleListClick = (item) => () => {
     setChatInfo({ 
@@ -36,6 +43,20 @@ function ChatsContainer({ primaryList, secondaryList, onlineList }) {
       chatId: item.chatId,
       chatName: item.name
     });
+  }
+
+  const handleUserList = async () => {
+    dispatchUserList({ type: "API_FETCH_INIT" });
+    const result = await axios.get('/users/all');
+
+    try {
+      dispatchUserList({ 
+        type: "API_FETCH_SUCCESS",
+        payload: result.data
+      });
+    } catch(err) {
+      dispatchUserList({ type: "API_FETCH_ERROR" });
+    }
   }
 
   return(
@@ -59,7 +80,7 @@ function ChatsContainer({ primaryList, secondaryList, onlineList }) {
           centered
         >
           <Tab label="Chats" />
-          <Tab label="Users" />
+          <Tab label="Users" onClick={() => handleUserList()}/>
         </Tabs>
       </AppBar>
       <ChatList 
@@ -69,7 +90,12 @@ function ChatsContainer({ primaryList, secondaryList, onlineList }) {
         value={value}
         index={0}
       />
-      <UserList onlineList={onlineList} value={value} index={1}/>
+      <UserList
+        userList={userList}
+        onlineList={onlineList} 
+        value={value} 
+        index={1}
+      />
     </Container>
   );
 }

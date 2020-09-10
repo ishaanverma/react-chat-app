@@ -130,6 +130,17 @@ function Home() {
       }));
     });
 
+    // get currently online users
+    socket.on('currentOnline', (data) => {
+      data.userIds.forEach(userId => {
+        setOnlineList(prevState => ({
+          ...prevState,
+          [userId]: 'online',
+        }));
+        console.log(userId);
+      });
+    });
+
   }, [socket, chatInfo.chatId])
 
   useEffect(() => {

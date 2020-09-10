@@ -1,39 +1,16 @@
-import React, { useReducer, useEffect } from 'react';
+import React from 'react';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import ListWithText from './ListWithText';
-import { apiReducer } from '../reducer/apiReducer';
 
 const UserList = (props) => {
   const [error, setError] = React.useState(false);
   const [name, setName] = React.useState("");
   const [checked, setChecked] = React.useState([]);
-  const [userList, dispatchUserList] = useReducer(apiReducer, {
-    data: [],
-    isLoading: false,
-    isError: false
-  });
   const onlineList = props.onlineList;
-
-  const handleButton = async () => {
-    dispatchUserList({ type: "API_FETCH_INIT" });
-    const result = await axios.get('/users/all');
-
-    try {
-      dispatchUserList({ 
-        type: "API_FETCH_SUCCESS",
-        payload: result.data
-      });
-    } catch(err) {
-      dispatchUserList({ type: "API_FETCH_ERROR" });
-    }
-  }
-
-  useEffect(() => {
-    handleButton();
-  }, [props.value])
+  const userList = props.userList;
 
   // keep track of selected items
   const handleToggle = (value) => () => {

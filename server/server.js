@@ -65,6 +65,11 @@ io.use((socket, next) => {
 
 io.on('connection', async (socket) => {
   console.log('user connected');
+  
+  // send list of currently online users
+  socket.emit('currentOnline', {
+    'userIds': Array.from(id_to_socket.keys())
+  });
   id_to_socket.set(socket.userId, socket.id);
 
   // map id to username
@@ -133,6 +138,7 @@ io.on('connection', async (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected');
     id_to_socket.delete(socket.userId);
+    id_to_name.delete(socket.userId);
     socket.broadcast.emit('isOnline', {
       'userId': socket.userId,
       'status': 'offline'
