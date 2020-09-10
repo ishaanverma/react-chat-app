@@ -87,10 +87,10 @@ io.on('connection', async (socket) => {
   // when user comes online, join the chat
   const chatIds = chats.map((item) => item.dataValues.ChatId.toString());
   socket.join(chatIds);
-  socket.broadcast.emit('online', {
+  socket.broadcast.emit('isOnline', {
     'userId': socket.userId,
     'status': 'online'
-  })
+  });
 
   socket.on('message', async (data) => {
     data = JSON.parse(data);
@@ -133,6 +133,10 @@ io.on('connection', async (socket) => {
   socket.on('disconnect', () => {
     console.log('user disconnected');
     id_to_socket.delete(socket.userId);
+    socket.broadcast.emit('isOnline', {
+      'userId': socket.userId,
+      'status': 'offline'
+    });
   });
 })
 

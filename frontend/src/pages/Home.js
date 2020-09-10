@@ -123,20 +123,12 @@ function Home() {
     });
 
     // user online event
-    socket.on('online', (data) => {
+    socket.on('isOnline', (data) => {
       setOnlineList(prevState => ({
         ...prevState,
         [data.userId]: data.status,
       }));
     });
-
-    // user offline event
-    socket.on('offline', (data) => {
-      setOnlineList(prevState => ({
-        ...prevState,
-        [data.userId]: data.status
-      }));
-    })
 
   }, [socket, chatInfo.chatId])
 
