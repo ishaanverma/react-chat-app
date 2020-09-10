@@ -22,17 +22,17 @@ const ListWithText = ({ listData, click, data, icon, change, error }) =>
       fullWidth
     />
     <List>
-      { listData.isError && <p>Error</p> }
-      {listData.isLoading ? (
+      { listData.userList.isError && <p>Error</p> }
+      {listData.userList.isLoading ? (
         <LinearProgress />
       ) : (
-        listData.data.map((item, index) => {
+        listData.userList.data.map((item, index) => {
           return(
             <ListItem key={index} role={undefined} onClick={click(item)} dense button disableRipple>
               <ListItemAvatar>
                 <Avatar component={icon} />
               </ListItemAvatar>
-              <ListItemText primary={item.name} />
+              <ListItemText primary={item.name} secondary={listData.onlineList[item.id] === 'online' ? 'online' : 'offline'} />
               <ListItemSecondaryAction>
                 <Checkbox
                   edge="end"

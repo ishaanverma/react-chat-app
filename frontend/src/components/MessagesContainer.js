@@ -15,7 +15,7 @@ import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import SendRoundedIcon from '@material-ui/icons/SendRounded';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Snackbar from '@material-ui/core/Snackbar';
-import UserDrawer from './UserDrawer';
+import ChatMemberDrawer from './ChatMemberDrawer';
 import { ChatInfoContext } from '../context/chatInfo';
 import AppBarWithTitle from './AppBarWithTitle';
 import { ReactComponent as HomeSvg } from '../images/home.svg';
@@ -83,7 +83,6 @@ function MessageList({ list, submit, socket })  {
       if (typingFlag === false) {
         socket.emit('start typing', {
           'chatId': chatInfo.chatId,
-          'name': chatInfo.username,
         });
         setTypingFlag(true);
       }
@@ -130,7 +129,7 @@ function MessageList({ list, submit, socket })  {
     <Grid container direction="column" className={classes.root}>
       <Grid item className={classes.messageBarContainer}>
         <AppBarWithTitle title={chatInfo.chatName}>
-          <UserDrawer />
+          <ChatMemberDrawer />
         </AppBarWithTitle>
       </Grid>
       
@@ -157,7 +156,7 @@ function MessageList({ list, submit, socket })  {
                         <AccountCircleIcon />
                       </Avatar>
                     </ListItemAvatar>
-                    <ListItemText primary={item.content} secondary={item.User.name} />
+                    <ListItemText primary={item.content} secondary={item.User ? item.User.name : chatInfo.username} />
                   </ListItem>
                   <Divider />
                 </React.Fragment>
@@ -168,8 +167,8 @@ function MessageList({ list, submit, socket })  {
         </Container>
         }
       </Grid>
-      <Snackbar open={typing.start} message={`${typing.name} is typing`} style={{ bottom: '20%' }}/>
-      <Grid item className={classes.sendBarContainer}>
+      <Snackbar open={typing.start} message={`${typing.name} is typing...`} style={{ bottom: '20%' }}/>
+      <Grid item className={classes.sendBarContainer} hidden={chatInfo.chatId ? false : true}>
         <Paper 
           component="form" 
           className={classes.sendBar} 

@@ -15,7 +15,7 @@ import { apiReducerWithState } from '../reducer/apiReducerWithState';
 import { ChatInfoContext } from '../context/chatInfo';
 import { Divider } from '@material-ui/core';
 
-const UserDrawer = () => {
+const ChatMemberDrawer = () => {
   const [open, setOpen] = useState(false);
   const { chatInfo } = useContext(ChatInfoContext);
   const [users, dispatchUserList] = useReducer(apiReducerWithState, {
@@ -52,9 +52,10 @@ const UserDrawer = () => {
         <Toolbar>
           <Typography>Chat Members</Typography>
         </Toolbar>
-        <Divider />
+        
         <div style={{ width: 250 }}>
           <List>
+            <Divider />
             {users.isError && <p>Error</p>}
             {users.isLoading ? (
               <LinearProgress />
@@ -78,4 +79,4 @@ const UserDrawer = () => {
   );
 }
 
-export default UserDrawer;
+export default ChatMemberDrawer;

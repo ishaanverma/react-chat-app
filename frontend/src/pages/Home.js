@@ -11,7 +11,7 @@ import { ChatInfoContext } from '../context/chatInfo';
 
 const ENDPOINT = process.env.WEBSOCKET_ENDPOINT || 'http://localhost:5000';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
     height: '100vh'
@@ -23,6 +23,7 @@ function Home() {
   const [socket, setSocket] = useState();
   const { chatInfo } = useContext(ChatInfoContext);
   const [lastMessageList, setLastMessageList] = useState({});
+  const [onlineList, setOnlineList] = useState(new Map());
   const [messages, dispatchMessageList] = useReducer(apiReducerWithState, {
     data: [],
     isLoading: false,
@@ -43,9 +44,6 @@ function Home() {
       "content": message,
       "createdAt": "null",
       "chatId": chatInfo.chatId,
-      "User": {
-        "name": chatInfo.username
-      }
     }
     event.target.message.value = '';
     dispatchMessageList({
@@ -124,6 +122,25 @@ function Home() {
       });
     });
 
+    // user online event
+    socket.on('isOnline', (data) => {
+      setOnlineList(prevState => ({
+        ...prevState,
+        [data.userId]: data.status,
+      }));
+    });
+
+    // get currently online users
+    socket.on('currentOnline', (data) => {
+      data.userIds.forEach(userId => {
+        setOnlineList(prevState => ({
+          ...prevState,
+          [userId]: 'online',
+        }));
+        console.log(userId);
+      });
+    });
+
   }, [socket, chatInfo.chatId])
 
   useEffect(() => {
@@ -134,7 +151,11 @@ function Home() {
     <Grid container className={classes.root} spacing={0}>
       <Grid container spacing={0}>
         <Grid item xs>
-          <ChatsContainer primaryList={chatList} secondaryList={lastMessageList} />
+          <ChatsContainer 
+            primaryList={chatList} 
+            secondaryList={lastMessageList}
+            onlineList={onlineList}
+          />
         </Grid>
         <Grid item xs={9}>
           <MessagesContainer 
