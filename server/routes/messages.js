@@ -5,7 +5,7 @@ const { models } = require('../models');
 const router = express.Router();
 
 router.post('/all', isAuthenticated, async(req, res) => {
-  const { chatId } = req.body;
+  const { chatId, offset=0, limit=10 } = req.body;
 
   // check if user is part of the chat
   const user = await models.User.findOne({
@@ -21,7 +21,7 @@ router.post('/all', isAuthenticated, async(req, res) => {
   if (chat.length === 0) return res.status(404).send("Chat not found");
 
   // fetch messages belonging to the chat
-  const messages = await models.Message.findAll({
+  const messages = await models.Message.findAndCountAll({
     where: {
       ChatId: chat[0].dataValues.id
     },
@@ -30,7 +30,12 @@ router.post('/all', isAuthenticated, async(req, res) => {
       attributes: ['name'],
     }],
     attributes: ['type', 'content', 'createdAt', 'ChatId'],
-  })
+    offset: offset,
+    limit: limit,
+    order: [
+      ['createdAt', 'DESC']
+    ]
+  });
   res.status(200).send(messages);
 });
 
