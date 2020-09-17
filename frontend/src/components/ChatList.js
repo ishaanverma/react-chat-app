@@ -6,6 +6,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import ListItemText from '@material-ui/core/ListItemText';
+import Badge from '@material-ui/core/Badge';
 
 const ChatList = ({ listData, icon, click, ...props }) => 
   <List
@@ -25,9 +26,23 @@ const ChatList = ({ listData, icon, click, ...props }) =>
               onClick={!click ? undefined : click(item)}
             >
               <ListItemAvatar>
-                <Avatar component={icon} />
+                <Badge
+                  color="secondary"
+                  badgeContent={listData.secondaryList.count[item.chatId]}
+                  overlap="circle"
+                  anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "right"
+                  }}
+                >
+                  <Avatar component={icon} />
+                </Badge>
               </ListItemAvatar>
-              <ListItemText primary={item.name} secondary={listData.secondaryList[item.chatId]} />
+              <ListItemText 
+                primary={item.name} 
+                secondary={`
+                  ${listData.secondaryList.message[item.chatId] ? listData.secondaryList.message[item.chatId] : ''}
+                `} />
             </ListItem>
             <Divider />
           </React.Fragment>

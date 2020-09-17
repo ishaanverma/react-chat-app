@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
@@ -20,7 +20,7 @@ import { ChatInfoContext } from '../context/chatInfo';
 import AppBarWithTitle from './AppBarWithTitle';
 import { ReactComponent as HomeSvg } from '../images/home.svg';
 
-const WAIT_INTERVAL = 2000;
+const WAIT_INTERVAL = 1000;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -68,14 +68,30 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-function MessageList({ list, submit, socket })  {
+function MessageList({ list, submit, socket, loadMore })  {
   const classes = useStyles();
   const typingTimeout = useRef();
   const messageEndRef = useRef();
   const [typingFlag, setTypingFlag] = useState(false);
   const [typing, setTyping] = useState({});
   const { chatInfo } = useContext(ChatInfoContext);
+  const chatId = useRef(chatInfo.chatId);
+  const scrollObserver = useRef();
 
+  // observe if the last message comes on screen
+  const lastMessageRef = useCallback((node) => {
+    if (list.isLoading || list.isError) return;
+    if (scrollObserver.current) scrollObserver.current.disconnect();
+    scrollObserver.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting)  {
+        loadMore(chatId.current);
+        console.log("visible");
+      }
+    });
+    if (node) scrollObserver.current.observe(node);
+  }, [list.isLoading, list.isError, loadMore]);
+
+  // observe key presses for typing event
   const handleKeyPress = (event) => {
     if (event.keyCode !== 13) {
       clearTimeout(typingTimeout.current);
@@ -96,6 +112,7 @@ function MessageList({ list, submit, socket })  {
     }    
   }
 
+  // new chat message scrolls to the bottom
   const scrollToBottom = () => {
     if (messageEndRef.current)
       messageEndRef.current.scrollIntoView({ behavior: "auto" });
@@ -108,7 +125,7 @@ function MessageList({ list, submit, socket })  {
 
     // typing events
     socket.on('start typing', (data) => {
-      if (chatInfo.chatId === data.chatId)
+      if (chatId.current === data.chatId)
         setTyping(prevState => ({
           ...prevState,
           'start': true,
@@ -123,7 +140,11 @@ function MessageList({ list, submit, socket })  {
       }));
     });
 
-  }, [socket, chatInfo.chatId])
+  }, [socket])
+
+  useEffect(() => {
+    chatId.current = chatInfo.chatId;
+  }, [chatInfo.chatId])
 
   return(
     <Grid container direction="column" className={classes.root}>
@@ -143,25 +164,43 @@ function MessageList({ list, submit, socket })  {
         }
         {chatInfo.chatId && 
         <Container maxWidth={false} disableGutters className={classes.messagesContainer}>
+          {/* <Button onClick={() => loadMore(chatInfo.chatId)}>Load More</Button> */}
           <List className={classes.list}>
             {list.isError && <p>Error</p>}
-            {list.isLoading ? (
-              <LinearProgress />
-            ) : (
-              list.data.map((item, index) => 
-                <React.Fragment key={index}>
-                  <ListItem>
-                    <ListItemAvatar>
-                      <Avatar>
-                        <AccountCircleIcon />
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText primary={item.content} secondary={item.User ? item.User.name : chatInfo.username} />
-                  </ListItem>
-                  <Divider />
-                </React.Fragment>
-              )
-            )}
+            {list.isLoading && <LinearProgress />}
+            {
+              list.data.map((item, index) => {
+                if (index === 0)  {
+                  return (
+                    <React.Fragment key={index}>
+                      <ListItem ref={lastMessageRef}>
+                        <ListItemAvatar>
+                          <Avatar>
+                            <AccountCircleIcon />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary={item.content} secondary={item.User ? item.User.name : chatInfo.username} />
+                      </ListItem>
+                      <Divider />
+                    </React.Fragment>
+                  );
+                } else {
+                  return (
+                    <React.Fragment key={index}>
+                      <ListItem>
+                        <ListItemAvatar>
+                          <Avatar>
+                            <AccountCircleIcon />
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary={item.content} secondary={item.User ? item.User.name : chatInfo.username} />
+                      </ListItem>
+                      <Divider />
+                    </React.Fragment>
+                  );
+                }
+              })
+            }
             <div ref={messageEndRef} />
           </List>
         </Container>

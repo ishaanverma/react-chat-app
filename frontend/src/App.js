@@ -15,9 +15,9 @@ import './App.css';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(localStorage.getItem('authenticated') || '');
   const [chatInfo, setChatInfo] = useState({
-    username: localStorage.getItem('username') || '',
-    chatId: '',
-    chatName: '',
+    "username": localStorage.getItem('username') || '',
+    "chatId": null,
+    "chatName": null
   });
 
   const setAuthenticated = (data) => {

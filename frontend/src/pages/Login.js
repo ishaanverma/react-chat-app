@@ -40,7 +40,7 @@ function Login() {
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [helperText, setHelperText] = useState('');
   const { setAuthenticated } = useAuth();
-  const { chatInfo, setChatInfo } = useContext(ChatInfoContext);
+  const { setChatInfo } = useContext(ChatInfoContext);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -59,10 +59,10 @@ function Login() {
     if (result && result.status === 200)  {
       setAuthenticated(true);
       setLoggedIn(true);
-      setChatInfo({
-        ...chatInfo,
-        username: result.data.name
-      })
+      setChatInfo(prevState => ({
+        ...prevState,
+        "username": result.data.name 
+      }));
       localStorage.setItem('username', result.data.name);
     } else {
       setHelperText('An Error Occurred');

@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
 
 function ChatsContainer({ primaryList, secondaryList, onlineList }) {
   const classes = useStyles();
-  const { chatInfo, setChatInfo } = useContext(ChatInfoContext);
+  const { setChatInfo } = useContext(ChatInfoContext);
   const [value, setValue] = useState(0);
   const [userList, dispatchUserList] = useReducer(apiReducer, {
     data: [],
@@ -38,11 +38,11 @@ function ChatsContainer({ primaryList, secondaryList, onlineList }) {
   });
   
   const handleListClick = (item) => () => {
-    setChatInfo({ 
-      ...chatInfo, 
-      chatId: item.chatId,
-      chatName: item.name
-    });
+    setChatInfo(prevState => ({
+      ...prevState, 
+      "chatId": item.chatId,
+      "chatName": item.name
+    }));
   }
 
   const handleUserList = async () => {
@@ -75,7 +75,6 @@ function ChatsContainer({ primaryList, secondaryList, onlineList }) {
           indicatorColor="primary"
           textColor="primary"
           onChange={(event, newValue) => setValue(newValue)}
-          aria-label="disabled tabs example"
           variant="standard"
           centered
         >
